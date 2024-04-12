@@ -1,0 +1,26 @@
+[
+  {
+    "name":"Military Science",
+    "status": "Finished",
+    "date": "06 Apr 2022",
+    "progress": 75.5  
+  },
+  {
+    "name":"Algorithms Design and Analysis",
+    "status": "Almost Done",
+    "date": "25 Apr 2024",
+    "progress": 75.5  
+  },
+  {
+    "name":"Physics II",
+    "status": "Not Started",
+    "date": "20 Apr 2024",
+    "progress": 10  
+  },
+  {
+    "name":"Operating Systems Lab",
+    "status": "Almost Done",
+    "date": "Unknown",
+    "progress": 60.5  
+  }
+]
