@@ -11,7 +11,7 @@ import {
 import MiniCalendar from "components/calendar/MiniCalendar";
 import MiniStatistics from "components/card/MiniStatistics";
 import IconBox from "components/icons/IconBox";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   MdAddTask,
   MdFileCopy,
@@ -32,18 +32,18 @@ export default function UserReports() {
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
 
   const [numberOfCourses, setNumberOfCourses] = useState(0);
-
-  useEffect(() => {
-    fetchNumberOfCourses();
-  }, []);
+  //const { token, loading } = useContext(AuthContext);
 
   const fetchNumberOfCourses = async () => {
     const response = await fetch("http://localhost:3000/course/user/userId");
     const x = await response.json();
     console.log(x);
     setNumberOfCourses(x);
-    //setNumberOfCourses(data); //Setting the response into state
   };
+
+  useEffect(() => {
+    fetchNumberOfCourses();
+  }, []);
 
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
@@ -92,13 +92,6 @@ export default function UserReports() {
         <TotalSpent />
         <WeeklyRevenue />
       </SimpleGrid>
-      {/* <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
-        <CheckTable columnsData={columnsDataCheck} tableData={tableDataCheck} />
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px'>
-          <DailyTraffic />
-          <PieCard />
-        </SimpleGrid>
-      </SimpleGrid> */}
       <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
         <ComplexTable
           columnsData={columnsDataComplex}
