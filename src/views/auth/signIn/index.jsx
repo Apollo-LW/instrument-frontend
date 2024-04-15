@@ -1,5 +1,5 @@
-import React , { useContext, useState } from "react";
-import { NavLink } from "react-router-dom";
+import React , { useContext, useEffect, useState } from "react";
+import { NavLink, useHistory } from "react-router-dom";
 // Chakra imports
 import {
   Box,
@@ -28,6 +28,13 @@ import axios from "axios";
 import { AuthContext } from "contexts/AuthContext";
 
 function SignIn() {
+  const history = useHistory();
+  useEffect(() => {
+    if (localStorage.getItem("token") != null) {
+      history.push("/admin");
+    }
+  }, []);
+  
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -48,6 +55,7 @@ function SignIn() {
       setToken(accessToken);
       console.log(accessToken);
       localStorage.setItem("token", accessToken);
+      history.push('/admin')
     } catch (error) {
       console.log("Authentication error > ", error);
       setToken(null);
@@ -78,6 +86,7 @@ function SignIn() {
   );
   const [show, setShow] = React.useState(false);
   const handleClick = () => setShow(!show);
+
   return (
     <DefaultAuth illustrationBackground={illustration} image={illustration}>
       <Flex

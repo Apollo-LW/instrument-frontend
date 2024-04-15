@@ -13,15 +13,15 @@ ReactDOM.render(
 	<ChakraProvider theme={theme}>
 		<React.StrictMode>
 			<ThemeEditorProvider>
-				<AuthProvider>
 					<HashRouter>
 						<Switch>
-							<Route path={`/auth`} component={AuthLayout} />
-							<Route path={`/admin`} component={AdminLayout} />
-							<Redirect from='/' to='/auth' />
+							<AuthProvider>
+								<Route path={`/auth`} component={AuthLayout} />
+								<Route path={`/admin`} component={AdminLayout} />
+								<Redirect from='/' to='/admin'/>
+							</AuthProvider>
 						</Switch>
 					</HashRouter>
-				</AuthProvider>
 			</ThemeEditorProvider>
 		</React.StrictMode>
 	</ChakraProvider>,
