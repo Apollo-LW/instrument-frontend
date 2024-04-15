@@ -34,7 +34,7 @@ function SignIn() {
       history.push("/admin");
     }
   }, []);
-  
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -58,6 +58,35 @@ function SignIn() {
       history.push('/admin')
     } catch (error) {
       console.log("Authentication error > ", error);
+      setToken(null);
+      localStorage.removeItem("token");
+      if (error.response && error.response.data) {
+        setError(error.response.data); // Set the error message if present in the error response
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    }
+  }
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const register = await axios.post("http://localhost:3000/auth/register", {
+        "username": username,
+        "password": password
+      });
+      // you have to login to get the token
+      const login = await axios.post("http://localhost:3000/auth/login", {
+        "username": username,
+        "password": password
+      });
+      const accessToken = login.data.accessToken
+      setToken(accessToken);
+      console.log(accessToken);
+      localStorage.setItem("token", accessToken);
+      history.push('/admin')
+    } catch (error) {
+      console.log("Registeration Error ", error);
       setToken(null);
       localStorage.removeItem("token");
       if (error.response && error.response.data) {
@@ -244,13 +273,14 @@ function SignIn() {
             <Text color={textColorDetails} fontWeight='400' fontSize='14px'>
               Not registered yet?
               <NavLink to='/auth/sign-up'>
-                <Text
+                <Button
                   color={textColorBrand}
                   as='span'
+                  onClick={handleRegister}
                   ms='5px'
                   fontWeight='500'>
                   Create an Account
-                </Text>
+                </Button>
               </NavLink>
             </Text>
           </Flex>
