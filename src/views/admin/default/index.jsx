@@ -6,16 +6,19 @@ import {
   SimpleGrid,
   useColorModeValue,
 } from "@chakra-ui/react";
+import axios from "axios";
 // Assets
 // Custom components
 import MiniCalendar from "components/calendar/MiniCalendar";
 import MiniStatistics from "components/card/MiniStatistics";
 import IconBox from "components/icons/IconBox";
-import React, { useEffect, useState } from "react";
+import { AuthContext } from "contexts/AuthContext";
+import React, { useContext, useEffect, useState } from "react";
 import {
   MdAddTask,
   MdFileCopy,
 } from "react-icons/md";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ComplexTable from "views/admin/default/components/ComplexTable";
 import Tasks from "views/admin/default/components/Tasks";
 import TotalSpent from "views/admin/default/components/TotalSpent";
@@ -31,19 +34,34 @@ export default function UserReports() {
   const brandColor = useColorModeValue("brand.500", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
 
+  const history = useHistory();
   const [numberOfCourses, setNumberOfCourses] = useState(0);
+  const { token, loading } = useContext(AuthContext);
+
+  const fetchNumberOfCourses = async () => {
+    const response = await axios.get("http://localhost:3000/course/user/userId", {
+      headers: {
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+    const x = response.data;
+    console.log(x);
+    if (x) {
+      setNumberOfCourses(x);
+    }
+  };
 
   useEffect(() => {
     fetchNumberOfCourses();
   }, []);
 
-  const fetchNumberOfCourses = async () => {
-    const response = await fetch("http://localhost:3000/course/user/userId");
-    const x = await response.json();
-    console.log(x);
-    setNumberOfCourses(x);
-    //setNumberOfCourses(data); //Setting the response into state
-  };
+  if (loading) {
+    return null;
+  }
+
+  if (!token) {
+    history.push("/auth");
+  }
 
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
@@ -92,13 +110,6 @@ export default function UserReports() {
         <TotalSpent />
         <WeeklyRevenue />
       </SimpleGrid>
-      {/* <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
-        <CheckTable columnsData={columnsDataCheck} tableData={tableDataCheck} />
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px'>
-          <DailyTraffic />
-          <PieCard />
-        </SimpleGrid>
-      </SimpleGrid> */}
       <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
         <ComplexTable
           columnsData={columnsDataComplex}

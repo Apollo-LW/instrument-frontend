@@ -1,28 +1,5 @@
-/* eslint-disable */
-/*!
-  _   _  ___  ____  ___ ________  _   _   _   _ ___   
- | | | |/ _ \|  _ \|_ _|__  / _ \| \ | | | | | |_ _| 
- | |_| | | | | |_) || |  / / | | |  \| | | | | || | 
- |  _  | |_| |  _ < | | / /| |_| | |\  | | |_| || |
- |_| |_|\___/|_| \_\___/____\___/|_| \_|  \___/|___|
-                                                                                                                                                                                                                                                                                                                                       
-=========================================================
-* Horizon UI - v1.1.0
-=========================================================
-
-* Product Page: https://www.horizon-ui.com/
-* Copyright 2023 Horizon UI (https://www.horizon-ui.com/)
-
-* Designed and Coded by Simmmple
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React , { useContext, useEffect, useState } from "react";
+import { NavLink, useHistory } from "react-router-dom";
 // Chakra imports
 import {
   Box,
@@ -47,8 +24,79 @@ import illustration from "assets/img/auth/auth.png";
 import { FcGoogle } from "react-icons/fc";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
+import axios from "axios";
+import { AuthContext } from "contexts/AuthContext";
 
 function SignIn() {
+  const history = useHistory();
+  useEffect(() => {
+    if (localStorage.getItem("token") != null) {
+      history.push("/admin");
+    }
+  }, []);
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { setToken } = useContext(AuthContext);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const jsonUserData = JSON.stringify({
+        "username": username,
+        "password": password
+      });
+      console.log(jsonUserData);
+      const response = await axios.post("http://localhost:3000/auth/login", {
+        "username": username,
+        "password": password
+      });
+      const accessToken = response.data.accessToken
+      setToken(accessToken);
+      console.log(accessToken);
+      localStorage.setItem("token", accessToken);
+      history.push('/admin')
+    } catch (error) {
+      console.log("Authentication error > ", error);
+      setToken(null);
+      localStorage.removeItem("token");
+      if (error.response && error.response.data) {
+        setError(error.response.data); // Set the error message if present in the error response
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    }
+  }
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const register = await axios.post("http://localhost:3000/auth/register", {
+        "username": username,
+        "password": password
+      });
+      // you have to login to get the token
+      const login = await axios.post("http://localhost:3000/auth/login", {
+        "username": username,
+        "password": password
+      });
+      const accessToken = login.data.accessToken
+      setToken(accessToken);
+      console.log(accessToken);
+      localStorage.setItem("token", accessToken);
+      history.push('/admin')
+    } catch (error) {
+      console.log("Registeration Error ", error);
+      setToken(null);
+      localStorage.removeItem("token");
+      if (error.response && error.response.data) {
+        setError(error.response.data); // Set the error message if present in the error response
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    }
+  }
+
   // Chakra color mode
   const textColor = useColorModeValue("navy.700", "white");
   const textColorSecondary = "gray.400";
@@ -67,6 +115,7 @@ function SignIn() {
   );
   const [show, setShow] = React.useState(false);
   const handleClick = () => setShow(!show);
+
   return (
     <DefaultAuth illustrationBackground={illustration} image={illustration}>
       <Flex
@@ -91,7 +140,7 @@ function SignIn() {
             color={textColorSecondary}
             fontWeight='400'
             fontSize='md'>
-            Enter your email and password to sign in!
+            Enter your username and password to sign in!
           </Text>
         </Box>
         <Flex
@@ -128,6 +177,7 @@ function SignIn() {
             <HSeparator />
           </Flex>
           <FormControl>
+          {error && <div style={{ color: "red" }}>{error}</div>}{" "}
             <FormLabel
               display='flex'
               ms='4px'
@@ -135,7 +185,7 @@ function SignIn() {
               fontWeight='500'
               color={textColor}
               mb='8px'>
-              Email<Text color={brandStars}>*</Text>
+              Username<Text color={brandStars}>*</Text>
             </FormLabel>
             <Input
               isRequired={true}
@@ -143,7 +193,8 @@ function SignIn() {
               fontSize='sm'
               ms={{ base: "0px", md: "0px" }}
               type='email'
-              placeholder='mail@simmmple.com'
+              placeholder='MrMoon'
+              onChange={(un) => setUsername(un.target.value)}
               mb='24px'
               fontWeight='500'
               size='lg'
@@ -163,6 +214,7 @@ function SignIn() {
                 placeholder='Min. 8 characters'
                 mb='24px'
                 size='lg'
+                onChange={(pass) => setPassword(pass.target.value)}
                 type={show ? "text" : "password"}
                 variant='auth'
               />
@@ -207,6 +259,7 @@ function SignIn() {
               fontWeight='500'
               w='100%'
               h='50'
+              onClick={handleSubmit}
               mb='24px'>
               Sign In
             </Button>
@@ -220,13 +273,14 @@ function SignIn() {
             <Text color={textColorDetails} fontWeight='400' fontSize='14px'>
               Not registered yet?
               <NavLink to='/auth/sign-up'>
-                <Text
+                <Button
                   color={textColorBrand}
                   as='span'
+                  onClick={handleRegister}
                   ms='5px'
                   fontWeight='500'>
                   Create an Account
-                </Text>
+                </Button>
               </NavLink>
             </Text>
           </Flex>
