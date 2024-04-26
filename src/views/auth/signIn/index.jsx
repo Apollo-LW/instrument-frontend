@@ -31,7 +31,8 @@ function SignIn() {
   const history = useHistory();
   useEffect(() => {
     if (localStorage.getItem("token") != null) {
-      history.push("/admin");
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
     }
   }, []);
 
@@ -42,24 +43,22 @@ function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const jsonUserData = JSON.stringify({
-        "username": username,
-        "password": password
-      });
-      console.log(jsonUserData);
       const response = await axios.post("http://localhost:3000/auth/login", {
         "username": username,
         "password": password
       });
-      const accessToken = response.data.accessToken
-      setToken(accessToken);
-      console.log(accessToken);
-      localStorage.setItem("token", accessToken);
+
+      const data = response.data;
+      setToken(data.accessToken);
+      localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("userId", data.userId);
+
       history.push('/admin')
     } catch (error) {
       console.log("Authentication error > ", error);
       setToken(null);
       localStorage.removeItem("token");
+      localStorage.removeItem("username");
       if (error.response && error.response.data) {
         setError(error.response.data); // Set the error message if present in the error response
       } else {

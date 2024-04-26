@@ -21,7 +21,7 @@ export default function Overview() {
   const [email, setEmail] = useState("");
 
   const fetchFullName = async () => {
-    const response = await axios.get("http://localhost:3000/user/username/MrMoon", {
+    const response = await axios.get(`http://localhost:3000/user/${localStorage.getItem("userId")}`, {
       headers: {
         "Authorization" : `Bearer ${localStorage.getItem("token")}`,
       }
@@ -32,8 +32,6 @@ export default function Overview() {
       setFullName(`${x.firstName} ${x.lastName}`);
       setUsername(x.username);
       setEmail(x.email);
-      console.log(x.email);
-      console.log(x.username);
     }
   };
 
@@ -60,9 +58,6 @@ export default function Overview() {
           avatar={avatar}
           name={fullName}
           user={username}
-          posts='17'
-          followers='9.7k'
-          following='274'
         />
         <Storage
           gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
