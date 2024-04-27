@@ -38,20 +38,12 @@ export default function Project(props) {
             color={textColorSecondary}
             fontSize='sm'
             me='4px'>
-            Project #{ranking} •{" "}
+            Course #{ranking} •{" "}
             <Link fontWeight='500' color={brandColor} href={link} fontSize='sm'>
-              See project details
+              See course details
             </Link>
           </Text>
         </Box>
-        <Link
-          href={link}
-          variant='no-hover'
-          me='16px'
-          ms='auto'
-          p='0px !important'>
-          <Icon as={MdEdit} color='secondaryGray.500' h='18px' w='18px' />
-        </Link>
       </Flex>
     </Card>
   );
