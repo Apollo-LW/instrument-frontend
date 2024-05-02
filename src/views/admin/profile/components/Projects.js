@@ -28,7 +28,9 @@ export default function Projects(props) {
         "Authorization" : `Bearer ${localStorage.getItem("token")}`,
       }
     });
-
+    if (response.status == 401) {
+      return;
+    }
     const x = response.data;
     if (x) {
       setCourses(x);

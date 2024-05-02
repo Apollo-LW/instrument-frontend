@@ -17,8 +17,6 @@ import axios from "axios";
 
 export default function Overview() {
   const [username, setUsername] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
 
   const fetchFullName = async () => {
     const response = await axios.get(`http://localhost:3000/user/${localStorage.getItem("userId")}`, {
@@ -29,9 +27,7 @@ export default function Overview() {
 
     const x = response.data;
     if (x) {
-      setFullName(`${x.firstName} ${x.lastName}`);
       setUsername(x.username);
-      setEmail(x.email);
     }
   };
 
@@ -56,8 +52,7 @@ export default function Overview() {
           gridArea='1 / 1 / 2 / 2'
           banner={banner}
           avatar={avatar}
-          name={fullName}
-          user={username}
+          name={username}
         />
         <Storage
           gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
@@ -101,15 +96,6 @@ export default function Overview() {
           gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
           minH='365px'
           pe='20px'
-        />
-        <Notifications
-          used={25.6}
-          total={50}
-          gridArea={{
-            base: "3 / 1 / 4 / 2",
-            lg: "2 / 1 / 3 / 3",
-            "2xl": "1 / 3 / 2 / 4",
-          }}
         />
       </Grid>
     </Box>

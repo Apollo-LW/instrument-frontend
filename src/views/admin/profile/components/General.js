@@ -1,12 +1,37 @@
 // Chakra imports
 import { SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
+import axios from "axios";
 // Custom components
 import Card from "components/card/Card.js";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Information from "views/admin/profile/components/Information";
 
 // Assets
 export default function GeneralInformation(props) {
+
+  const [firstName, setFirst] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const fetchProfile = async () => {
+    const response = await axios.get(`http://localhost:3000/user/${localStorage.getItem("userId")}`, {
+      headers: {
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    const x = response.data;
+    if (x) {
+      setFirst(x.firstName);
+      setLastName(x.lastName);
+      setEmail(x.email);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
   const { ...rest } = props;
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -26,42 +51,23 @@ export default function GeneralInformation(props) {
         General Information
       </Text>
       <Text color={textColorSecondary} fontSize='md' me='26px' mb='40px'>
-        As we live, our hearts turn colder. Cause pain is what we go through as
-        we become older. We get insulted by others, lose trust for those others.
-        We get back stabbed by friends. It becomes harder for us to give others
-        a hand. We get our heart broken by people we love, even that we give
-        them all...
+      "The future belongs to the curious. The ones who are not afraid to try it, explore it, poke at it, question it and turn it inside out"
       </Text>
-      <SimpleGrid columns='2' gap='20px'>
+      <SimpleGrid columns='1' gap='20px'>
         <Information
           boxShadow={cardShadow}
-          title='Education'
-          value='Stanford University'
+          title='First Name'
+          value={firstName}
         />
         <Information
           boxShadow={cardShadow}
-          title='Languages'
-          value='English, Spanish, Italian'
+          title='Last Name'
+          value={lastName}
         />
         <Information
           boxShadow={cardShadow}
-          title='Department'
-          value='Product Design'
-        />
-        <Information
-          boxShadow={cardShadow}
-          title='Work History'
-          value='Google, Facebook'
-        />
-        <Information
-          boxShadow={cardShadow}
-          title='Organization'
-          value='Simmmple Web LLC'
-        />
-        <Information
-          boxShadow={cardShadow}
-          title='Birthday'
-          value='20 July 1986'
+          title='Email'
+          value={email}
         />
       </SimpleGrid>
     </Card>
