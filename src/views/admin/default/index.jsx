@@ -39,15 +39,20 @@ export default function UserReports() {
   const { token, loading } = useContext(AuthContext);
 
   const fetchNumberOfCourses = async () => {
-    const response = await axios.get("http://localhost:3000/course/user/userId", {
-      headers: {
-        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+    try {
+      if (localStorage.getItem("token") != null) {
+          const response = await axios.get(`http://localhost:3000/course/user/${localStorage.getItem("userId")}`, {
+          headers: {
+            "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+          }
+        });
+        const x = response.data;
+        if (x) {
+          setNumberOfCourses(x);
+        } 
       }
-    });
-    const x = response.data;
-    console.log(x);
-    if (x) {
-      setNumberOfCourses(x);
+    } catch (e) {
+      console.log(e);
     }
   };
 

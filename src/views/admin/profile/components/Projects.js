@@ -4,9 +4,10 @@ import { Text, useColorModeValue } from "@chakra-ui/react";
 import Project1 from "assets/img/profile/Project1.png";
 import Project2 from "assets/img/profile/Project2.png";
 import Project3 from "assets/img/profile/Project3.png";
+import axios from "axios";
 // Custom components
 import Card from "components/card/Card.js";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Project from "views/admin/profile/components/Project";
 
 export default function Projects(props) {
@@ -17,6 +18,29 @@ export default function Projects(props) {
     "0px 18px 40px rgba(112, 144, 176, 0.12)",
     "unset"
   );
+  const pics = [Project1, Project2, Project3];
+
+  const [courses, setCourses] = useState([]);
+
+  const fetchUserCourses = async () => {
+    const response = await axios.get(`http://localhost:3000/course/user/list/${localStorage.getItem("userId")}`, {
+      headers: {
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+    if (response.status == 401) {
+      return;
+    }
+    const x = response.data;
+    if (x) {
+      setCourses(x);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserCourses();
+  }, []);
+
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
       <Text
@@ -25,35 +49,25 @@ export default function Projects(props) {
         fontSize='2xl'
         mt='10px'
         mb='4px'>
-        All projects
+        All Courses
       </Text>
       <Text color={textColorSecondary} fontSize='md' me='26px' mb='40px'>
-        Here you can find more details about your projects. Keep you user
-        engaged by providing meaningful information.
+        Dive deeper into your coursework! Here you'll find all the information you need to thrive, in-depth course descriptions.
       </Text>
-      <Project
-        boxShadow={cardShadow}
-        mb='20px'
-        image={Project1}
-        ranking='1'
-        link='#'
-        title='Technology behind the Blockchain'
-      />
-      <Project
-        boxShadow={cardShadow}
-        mb='20px'
-        image={Project2}
-        ranking='2'
-        link='#'
-        title='Greatest way to a good Economy'
-      />
-      <Project
-        boxShadow={cardShadow}
-        image={Project3}
-        ranking='3'
-        link='#'
-        title='Most essential tips for Burnout'
-      />
+      {
+        courses.map((course, index) =>
+          <div key={index}>
+            <Project 
+              ranking={index+1}
+              title={course.name}
+              link='#'
+              boxShadow={cardShadow}
+              mb='20px'
+              image={pics[index%3]}
+            />
+          </div>
+        )
+      }
     </Card>
   );
 }
