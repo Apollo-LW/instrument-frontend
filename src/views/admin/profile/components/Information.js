@@ -5,20 +5,17 @@ import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons';
 import Card from "components/card/Card.js";
 
 export default function Information(props) {
-  const { title, value, keyIn, onSubmitInfo, ...rest } = props;
-
-  console.log(keyIn);
-  console.log(value);
+  const { title, value, onSubmitInfo, setValue, ...rest } = props;
 
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
   const bg = useColorModeValue("white", "navy.700");
 
-  const EditableControls = ({ isEditing, onSubmit, onCancel, onEdit }) => {
+  const EditableControls = ({ isEditing, onCancel, onEdit }) => {
     return isEditing ? (
       <ButtonGroup size="sm">
-        <IconButton icon={<CheckIcon />} onClick={onSubmit} />
+        <IconButton icon={<CheckIcon />} onClick={onSubmitInfo} />
         <IconButton icon={<CloseIcon />} onClick={onCancel} />
       </ButtonGroup>
     ) : (
@@ -31,12 +28,12 @@ export default function Information(props) {
   return (
     <Card bg={bg} {...rest}>
       <Box>
-        <Text fontWeight='500' color={textColorSecondary} fontSize='sm'>
+        <Text fontWeight='500' color={textColorPrimary} fontSize='sm'>
           {title}
         </Text>
         <Editable
           key={Math.floor((Math.random() * 1000))}
-          color={textColorPrimary}
+          color={textColorSecondary}
           defaultValue={value}
           fontSize="xl"
           isPreviewFocusable={false}
@@ -44,7 +41,7 @@ export default function Information(props) {
           {props => (
             <>
               <EditablePreview />
-              <EditableInput />
+              <EditableInput onChange={event => setValue(event.target.value)}/>
               <EditableControls {...props} />
             </>
           )}

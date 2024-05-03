@@ -32,7 +32,7 @@ function SignIn() {
   useEffect(() => {
     if (localStorage.getItem("token") != null) {
       localStorage.removeItem("token");
-      localStorage.removeItem("username");
+      localStorage.removeItem("userId");
     }
   }, []);
 

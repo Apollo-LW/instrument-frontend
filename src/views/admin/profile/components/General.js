@@ -9,7 +9,7 @@ import Information from "views/admin/profile/components/Information";
 // Assets
 export default function GeneralInformation(props) {
 
-  const [firstName, setFirst] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -22,11 +22,39 @@ export default function GeneralInformation(props) {
 
     const x = response.data;
     if (x) {
-      setFirst(x.firstName);
+      setFirstName(x.firstName);
       setLastName(x.lastName);
       setEmail(x.email);
     }
   };
+
+  const updateFirstName = async () => {
+    console.log(updateFirstName);
+    const response = await axios.patch(`http://localhost:3000/user/${localStorage.getItem("userId")}`, {
+        "firstName": firstName,
+    }, {
+      "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+    });
+
+    const x = response.data;
+    if (x) {
+      console.log(x);
+    }
+  }
+
+  const updateLastName = async () => {
+    console.log(updateFirstName);
+    const response = await axios.patch(`http://localhost:3000/user/${localStorage.getItem("userId")}`, {
+        "lastName": lastName,
+    }, {
+      "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+    });
+
+    const x = response.data;
+    if (x) {
+      console.log(x);
+    }
+  }
 
   useEffect(() => {
     fetchProfile();
@@ -58,16 +86,21 @@ export default function GeneralInformation(props) {
           boxShadow={cardShadow}
           title='First Name'
           value={firstName}
+          onSubmitInfo={updateFirstName}
+          setValue={setFirstName}
         />
         <Information
           boxShadow={cardShadow}
           title='Last Name'
           value={lastName}
+          onSubmitInfo={updateLastName}
+          setValue={setLastName}
         />
         <Information
           boxShadow={cardShadow}
           title='Email'
           value={email}
+          onSubmitInfo={updateFirstName}
         />
       </SimpleGrid>
     </Card>
