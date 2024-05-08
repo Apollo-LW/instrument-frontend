@@ -6,6 +6,7 @@ import {
   MdPerson,
   MdHome,
   MdLock,
+  MdAccountBox,
   MdOutlineDragHandle,
 } from "react-icons/md";
 
@@ -17,6 +18,7 @@ import DataTables from "views/admin/dataTables";
 
 // Auth Imports
 import SignInCentered from "views/auth/signIn";
+import SignUpCentered from "views/auth/register";
 
 const routes = [
   {
@@ -61,6 +63,13 @@ const routes = [
     path: "/sign-in",
     icon: <Icon as={MdLock} width='20px' height='20px' color='inherit' />,
     component: SignInCentered,
+  },
+  {
+    name: "Register",
+    layout: "/auth",
+    path: "/register",
+    icon: <Icon as={MdAccountBox} width='20px' height='20px' color='inherit' />,
+    component: SignUpCentered,
   }
 ];
 

@@ -28,13 +28,12 @@ import { HSeparator } from "components/separator/Separator";
 import DefaultAuth from "layouts/auth/Default";
 // Assets
 import illustration from "assets/img/auth/auth.png";
-import { FcGoogle } from "react-icons/fc";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
 import axios from "axios";
 import { AuthContext } from "contexts/AuthContext";
 
-function SignIn() {
+function Register() {
   const history = useHistory();
   useEffect(() => {
     if (localStorage.getItem("token") != null) {
@@ -45,28 +44,38 @@ function SignIn() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [lastName, setLastName] = useState("");
   const [error, setError] = useState("");
   const { setToken } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3000/auth/login", {
+      const register = await axios.post("http://localhost:3000/auth/register", {
         "username": username,
-        "password": password
+        "password": password,
+        "firstName": firstName,
+        "lastName": lastName,
+        "email": email,
       });
-
-      const data = response.data;
-      setToken(data.accessToken);
-      localStorage.setItem("token", data.accessToken);
-      localStorage.setItem("userId", data.userId);
-
-      history.push('/admin')
+      const registerData = register.data;
+      console.log(registerData);
+      // you have to login to get the token
+      const login = await axios.post("http://localhost:3000/auth/register", {
+        "username": username,
+        "password": password,
+      });
+      const accessToken = login.data.accessToken
+      setToken(accessToken);
+      console.log(accessToken);
+      localStorage.setItem("token", accessToken);
+      history.push('/admin');
     } catch (error) {
-      console.log("Authentication error > ", error);
+      console.log("Registeration Error ", error);
       setToken(null);
       localStorage.removeItem("token");
-      localStorage.removeItem("username");
       if (error.response && error.response.data) {
         setError(error.response.data); // Set the error message if present in the error response
       } else {
@@ -81,16 +90,6 @@ function SignIn() {
   const textColorDetails = useColorModeValue("navy.700", "secondaryGray.600");
   const textColorBrand = useColorModeValue("brand.500", "white");
   const brandStars = useColorModeValue("brand.500", "brand.400");
-  const googleBg = useColorModeValue("secondaryGray.300", "whiteAlpha.200");
-  const googleText = useColorModeValue("navy.700", "white");
-  const googleHover = useColorModeValue(
-    { bg: "gray.200" },
-    { bg: "whiteAlpha.300" }
-  );
-  const googleActive = useColorModeValue(
-    { bg: "secondaryGray.300" },
-    { bg: "whiteAlpha.200" }
-  );
   const [show, setShow] = React.useState(false);
   const handleClick = () => setShow(!show);
 
@@ -110,7 +109,7 @@ function SignIn() {
         flexDirection='column'>
         <Box me='auto'>
           <Heading color={textColor} fontSize='36px' mb='10px'>
-            Sign In
+            Register
           </Heading>
           <Text
             mb='36px'
@@ -118,7 +117,7 @@ function SignIn() {
             color={textColorSecondary}
             fontWeight='400'
             fontSize='md'>
-            Enter your username and password to sign in!
+            Enter your info Register!
           </Text>
         </Box>
         <Flex
@@ -133,6 +132,75 @@ function SignIn() {
           mb={{ base: "20px", md: "auto" }}>
           <FormControl>
           {error && <div style={{ color: "red" }}>{error}</div>}{" "}
+          <FormLabel
+              display='flex'
+              ms='4px'
+              id="firstName"
+              fontSize='sm'
+              fontWeight='500'
+              color={textColor}
+              mb='8px'>
+              First Name Name<Text color={brandStars}>*</Text>
+            </FormLabel>
+            <Input
+              isRequired={true}
+              variant='auth'
+              fontSize='sm'
+              id="firstNameInput"
+              ms={{ base: "0px", md: "0px" }}
+              type='text'
+              placeholder='Mohammad'
+              onChange={(un) => setFirstName(un.target.value)}
+              mb='24px'
+              fontWeight='500'
+              size='lg'
+            />
+          <FormLabel
+              display='flex'
+              ms='4px'
+              id="lastName"
+              fontSize='sm'
+              fontWeight='500'
+              color={textColor}
+              mb='8px'>
+              Last Name<Text color={brandStars}>*</Text>
+            </FormLabel>
+            <Input
+              isRequired={true}
+              variant='auth'
+              fontSize='sm'
+              id="lastNameInput"
+              ms={{ base: "0px", md: "0px" }}
+              type='text'
+              placeholder='Abu-Amara'
+              onChange={(un) => setLastName(un.target.value)}
+              mb='24px'
+              fontWeight='500'
+              size='lg'
+            />
+            <FormLabel
+              display='flex'
+              ms='4px'
+              id="lastName"
+              fontSize='sm'
+              fontWeight='500'
+              color={textColor}
+              mb='8px'>
+              Email<Text color={brandStars}>*</Text>
+            </FormLabel>
+            <Input
+              isRequired={true}
+              variant='auth'
+              fontSize='sm'
+              id="emailInput"
+              ms={{ base: "0px", md: "0px" }}
+              type='text'
+              placeholder='Abu-Amara'
+              onChange={(un) => setEmail(un.target.value)}
+              mb='24px'
+              fontWeight='500'
+              size='lg'
+            />
             <FormLabel
               display='flex'
               ms='4px'
@@ -185,32 +253,6 @@ function SignIn() {
                 />
               </InputRightElement>
             </InputGroup>
-            <Flex justifyContent='space-between' align='center' mb='24px'>
-              <FormControl display='flex' alignItems='center'>
-                <Checkbox
-                  id='remember-login'
-                  colorScheme='brandScheme'
-                  me='10px'
-                />
-                <FormLabel
-                  htmlFor='remember-login'
-                  mb='0'
-                  fontWeight='normal'
-                  color={textColor}
-                  fontSize='sm'>
-                  Keep me logged in
-                </FormLabel>
-              </FormControl>
-              <NavLink to='/auth/forgot-password'>
-                <Text
-                  color={textColorBrand}
-                  fontSize='sm'
-                  w='124px'
-                  fontWeight='500'>
-                  Forgot password?
-                </Text>
-              </NavLink>
-            </Flex>
             <Button
               fontSize='sm'
               variant='brand'
@@ -219,32 +261,13 @@ function SignIn() {
               h='50'
               onClick={handleSubmit}
               mb='24px'>
-              Sign In
+              Register
             </Button>
           </FormControl>
-          <Flex
-            flexDirection='column'
-            justifyContent='center'
-            alignItems='start'
-            maxW='100%'
-            mt='0px'>
-            <Text color={textColorDetails} fontWeight='400' fontSize='14px'>
-              Not registered yet?
-              <NavLink to='/auth/register'>
-                <Button
-                  color={textColorBrand}
-                  as='span'
-                  ms='5px'
-                  fontWeight='500'>
-                  Create an Account
-                </Button>
-              </NavLink>
-            </Text>
-          </Flex>
         </Flex>
       </Flex>
     </DefaultAuth>
   );
 }
 
-export default SignIn;
+export default Register;

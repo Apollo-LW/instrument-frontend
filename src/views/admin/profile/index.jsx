@@ -1,5 +1,5 @@
 // Chakra imports
-import { Box, Grid } from "@chakra-ui/react";
+import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, Grid, useDisclosure } from "@chakra-ui/react";
 
 // Custom components
 import Banner from "views/admin/profile/components/Banner";
@@ -40,13 +40,14 @@ export default function Overview() {
         "Authorization" : `Bearer ${localStorage.getItem("token")}`,
       }
     });
-
-    const x = response.data;
-    if (x) {
-      console.log(x);
-      localStorage.removeItem("token");
-      localStorage.removeItem("userId");
-      history.push('/auth');
+    if (response.status.toString().startsWith("2")) {
+      const x = response.data;
+      if (x) {
+        console.log(x);
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        history.push('/auth');
+      }
     }
   }
 
@@ -131,8 +132,7 @@ export default function Overview() {
           <AlertDialog
             isOpen={isOpen}
             leastDestructiveRef={cancelRef}
-            onClose={onClose}
-          >
+            onClose={onClose}>
             <AlertDialogOverlay>
               <AlertDialogContent>
                 <AlertDialogHeader fontSize='lg' fontWeight='bold'>
