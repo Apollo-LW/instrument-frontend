@@ -1,5 +1,5 @@
 // Chakra imports
-import { Text, useColorModeValue } from "@chakra-ui/react";
+import { Button, Text, useColorModeValue } from "@chakra-ui/react";
 // Assets
 import Project1 from "assets/img/profile/Project1.png";
 import Project2 from "assets/img/profile/Project2.png";
@@ -68,6 +68,17 @@ export default function Projects(props) {
           </div>
         )
       }
+      <Button
+          me='100%'
+          mb='50px'
+          w='340px'
+          minW='340px'
+          mt={{ base: "20px", "2xl": "auto" }}
+          variant='brand'
+          background="Green"
+          fontWeight='500'>
+          Create Course
+      </Button>
     </Card>
   );
 }
