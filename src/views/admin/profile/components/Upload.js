@@ -49,6 +49,7 @@ export default function Upload(props) {
       const response = await axios.post("http://localhost:3002/api/files", formData);
       console.log(response.data);
       setUploadStatus(`Successfully Uploaded ${selectedFiles.length} assets :)`);
+      setSelectedFiles([]);
     } catch (e) {
       setUploadStatus("Upload Failed!");
     }
