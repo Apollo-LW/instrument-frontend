@@ -10,8 +10,21 @@ import {
   Thead,
   Tr,
   useColorModeValue,
+  useDisclosure,
+  Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  FormControl,
+  FormLabel,
+  ModalFooter,
+  Input,
+  Select
 } from "@chakra-ui/react";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   useGlobalFilter,
   usePagination,
@@ -25,11 +38,49 @@ import Menu from "components/menu/MainMenu";
 
 // Assets
 import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import axios from "axios";
 export default function ColumnsTable(props) {
   const { columnsData, tableData } = props;
+  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
+  const textColorSecondary = "gray.400";
+  const cardShadow = useColorModeValue(
+    "0px 18px 40px rgba(112, 144, 176, 0.12)",
+    "unset"
+  );
+
+  const initialRef = React.useRef();
+  const finalRef = React.useRef();
+  const history = useHistory();
+
+  const [taskName, setTaskName] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [status, setStatus] = useState("");
+  const [description, setDescription] = useState("");
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const createTask = async (e) => {
+    console.log(taskName);
+    console.log(dueDate);
+    console.log(status);
+    console.log(description);
+    const response = await axios.post(`http://localhost:3000/task`, {
+      "name": taskName,
+      "description": description,
+      "dueDate": dueDate,
+      "creatorID": localStorage.getItem("userId"),
+      "status": status
+    }, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+    console.log(response.data);
+    onClose();
+  }
 
   const tableInstance = useTable(
     {
@@ -65,7 +116,7 @@ export default function ColumnsTable(props) {
           fontSize='22px'
           fontWeight='700'
           lineHeight='100%'>
-          Complex Table
+          Tasks Table
         </Text>
         <Menu />
       </Flex>
@@ -170,6 +221,58 @@ export default function ColumnsTable(props) {
           })}
         </Tbody>
       </Table>
+      <Button
+        me='100%'
+        mb='50px'
+        w='140px'
+        minW='140px'
+        mt={{ base: "20px", "2xl": "auto" }}
+        variant='brand'
+        background="Green"
+        onClick={onOpen}
+        fontWeight='500'>
+        Create Task
+      </Button>
+      <Modal
+        initialFocusRef={initialRef}
+        finalFocusRef={finalRef}
+        isOpen={isOpen}
+        onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Create your Task</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl>
+              <FormLabel>Task name</FormLabel>
+              <Input ref={initialRef} placeholder='Remind me to clean' color={textColorPrimary} onChange={e => setTaskName(e.target.value)}/>
+            </FormControl>
+
+            <FormControl mt={4}>
+              <FormLabel>Task Desciption</FormLabel>
+              <Input placeholder='Task Desciption' color={textColorPrimary} onChange={e => setDescription(e.target.value)}/>
+            </FormControl>
+
+            <FormControl mt={4}>
+              <FormLabel>Due Date</FormLabel>
+              <Input type='datetime-local' color={textColorPrimary} onChange={e => setDueDate(e.target.value)} />
+            </FormControl>
+
+            <FormControl mt={4}>
+              <Select placeholder='Task Status' color={textColorPrimary} onChange={e => setStatus(e.target.options[e.target.selectedIndex].value)}>
+                <option value='Finished'>Finished</option>
+                <option value='AlmostDone'>Almost Done</option>
+                <option value='NotStarted'>Not Started</option>
+              </Select>
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button onClick={onClose} mr={3} background="red">Discard</Button>
+            <Button colorScheme='blue' mr={3} onClick={createTask}>Create</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Card>
   );
 }

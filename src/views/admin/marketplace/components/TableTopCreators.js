@@ -109,7 +109,7 @@ function TopCreatorTable(props) {
                           </Text>
                         </Flex>
                       );
-                    } else if (cell.column.Header === "Artworks") {
+                    } else if (cell.column.Header === "Courses") {
                       data = (
                         <Text
                           color={textColorSecondary}

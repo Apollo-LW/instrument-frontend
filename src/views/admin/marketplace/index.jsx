@@ -1,25 +1,3 @@
-/*!
-  _   _  ___  ____  ___ ________  _   _   _   _ ___   
- | | | |/ _ \|  _ \|_ _|__  / _ \| \ | | | | | |_ _| 
- | |_| | | | | |_) || |  / / | | |  \| | | | | || | 
- |  _  | |_| |  _ < | | / /| |_| | |\  | | |_| || |
- |_| |_|\___/|_| \_\___/____\___/|_| \_|  \___/|___|
-                                                                                                                                                                                                                                                                                                                                       
-=========================================================
-* Horizon UI - v1.1.0
-=========================================================
-
-* Product Page: https://www.horizon-ui.com/
-* Copyright 2023 Horizon UI (https://www.horizon-ui.com/)
-
-* Designed and Coded by Simmmple
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
 import React from "react";
 
 // Chakra imports
@@ -79,7 +57,7 @@ export default function Marketplace() {
               direction={{ base: "column", md: "row" }}
               align={{ base: "start", md: "center" }}>
               <Text color={textColor} fontSize='2xl' ms='24px' fontWeight='700'>
-                Trending NFTs
+                Trending Courses
               </Text>
               <Flex
                 align='center'
@@ -259,42 +237,36 @@ export default function Marketplace() {
               author='By Mark Benjamin'
               date='30s ago'
               image={Nft5}
-              price='0.91 ETH'
             />
             <HistoryItem
               name='Abstract Colors'
               author='By Esthera Jackson'
               date='58s ago'
               image={Nft1}
-              price='0.91 ETH'
             />
             <HistoryItem
               name='ETH AI Brain'
               author='By Nick Wilson'
               date='1m ago'
               image={Nft2}
-              price='0.91 ETH'
             />
             <HistoryItem
               name='Swipe Circles'
               author='By Peter Will'
               date='1m ago'
               image={Nft4}
-              price='0.91 ETH'
             />
             <HistoryItem
               name='Mesh Gradients '
               author='By Will Smith'
               date='2m ago'
               image={Nft3}
-              price='0.91 ETH'
             />
             <HistoryItem
               name='3D Cubes Art'
               author='By Manny Gates'
               date='3m ago'
               image={Nft6}
-              price='0.91 ETH'
             />
           </Card>
         </Flex>
