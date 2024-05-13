@@ -35,7 +35,7 @@ export default function Projects(props) {
   const [courseStartTimeDate, setCourseStartTimeDate] = useState("");
   const [courseEndTimeDate, setCourseEndTimeDate] = useState("");
   const [courseIsPublic, setCourseIsPublic] = useState(false);
-  const { value, getCheckboxProps } = useCheckboxGroup({defaultValue: ['Sun'],});
+  const { value, getCheckboxProps } = useCheckboxGroup({defaultValue: [],});
 
 
   const CustomCheckbox = (props) => {
@@ -102,7 +102,6 @@ export default function Projects(props) {
         "Authorization": `Bearer ${localStorage.getItem("token")}`,
       }
     });
-    console.log(response.data);
     onClose();
   };
 
@@ -133,8 +132,7 @@ export default function Projects(props) {
               link='#'
               boxShadow={cardShadow}
               mb='20px'
-              image={pics[index % 3]}
-            />
+              image={pics[index % 3]}/>
           </div>
         )
       }
@@ -200,7 +198,7 @@ export default function Projects(props) {
 
           <ModalFooter>
             <Button onClick={onClose} mr={3} background="red">Discard</Button>
-            <Button colorScheme='blue' mr={3} onClick={createCourse}>Save</Button>
+            <Button colorScheme='blue' mr={3} onClick={createCourse}>Create</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
