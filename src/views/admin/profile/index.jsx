@@ -16,34 +16,32 @@ import axios from "axios";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function Overview() {
+  const INSRUMENT_SERVICE = "http://localhost:3000";
   const [username, setUsername] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure()
   const cancelRef = React.useRef()
   const history = useHistory();
 
-  const fetchFullName = async () => {
-    const response = await axios.get(`http://localhost:3000/user/${localStorage.getItem("userId")}`, {
+  const fetchUsername = async () => {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/user/${localStorage.getItem("userId")}`, {
       headers: {
         "Authorization" : `Bearer ${localStorage.getItem("token")}`,
       }
     });
 
-    const x = response.data;
-    if (x) {
-      setUsername(x.username);
+    if (response.data) {
+      setUsername(response.data.username);
     }
   };
 
   const deleteAccount = async () => {
-    const response = await axios.delete(`http://localhost:3000/user/${localStorage.getItem("userId")}`, {
+    const response = await axios.delete(`${INSRUMENT_SERVICE}/user/${localStorage.getItem("userId")}`, {
       headers: {
         "Authorization" : `Bearer ${localStorage.getItem("token")}`,
       }
     });
     if (response.status.toString().startsWith("2")) {
-      const x = response.data;
-      if (x) {
-        console.log(x);
+      if (response.data) {
         localStorage.removeItem("token");
         localStorage.removeItem("userId");
         history.push('/auth');
@@ -52,7 +50,7 @@ export default function Overview() {
   }
 
   useEffect(() => {
-    fetchFullName();
+    fetchUsername();
   }, []);
 
   return (

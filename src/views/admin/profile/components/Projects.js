@@ -12,6 +12,7 @@ import axios from "axios";
 import Card from "components/card/Card.js";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import ValidationUtil from "utils";
 import Project from "views/admin/profile/components/Project";
 
 export default function Projects(props) {
@@ -29,12 +30,15 @@ export default function Projects(props) {
   const finalRef = React.useRef();
   const history = useHistory();
 
+  const INSRUMENT_SERVICE = "http://localhost:3000";
   const [courses, setCourses] = useState([]);
   const [courseName, setCourseName] = useState("");
+  const [courseDuration, setCourseDuration] = useState(0);
   const [courseDescription, setCourseDescription] = useState("");
   const [courseStartTimeDate, setCourseStartTimeDate] = useState("");
   const [courseEndTimeDate, setCourseEndTimeDate] = useState("");
   const [courseIsPublic, setCourseIsPublic] = useState(false);
+  const [error, setError] = useState("");
   const { value, getCheckboxProps } = useCheckboxGroup({defaultValue: [],});
 
 
@@ -73,35 +77,46 @@ export default function Projects(props) {
   }
 
   const fetchUserCourses = async () => {
-    const response = await axios.get(`http://localhost:3000/course/user/list/${localStorage.getItem("userId")}`, {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/course/user/list/${localStorage.getItem("userId")}`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`,
       }
     });
+    
     if (response.status == 401) {
       history.push("/auth");
       return;
     }
-    const x = response.data;
-    if (x) {
-      setCourses(x);
+    
+    if (response.data) {
+      setCourses(response.data);
     }
   };
 
   const createCourse = async (e) => {
-    const response = await axios.post(`http://localhost:3000/course`, {
-      "name": courseName,
-      "courseDescription": courseDescription,
-      "startTime": courseStartTimeDate,
-      "endTime": courseEndTimeDate,
-      "isPublic": courseIsPublic,
-      "repeatedDays": value,
-      "creatorID": localStorage.getItem("userId")
-    }, {
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("token")}`,
-      }
-    });
+    if (courseName === '' || courseName === ' ') {
+      setError("A valid name is required");
+      return;
+    }
+    
+    try {
+      await axios.post(`${INSRUMENT_SERVICE}/course`, {
+        "name": courseName,
+        "courseDescription": courseDescription,
+        "startTime": courseStartTimeDate,
+        "endTime": courseEndTimeDate,
+        "isPublic": courseIsPublic,
+        "repeatedDays": value,
+        "duration": courseDuration,
+        "creatorID": localStorage.getItem("userId")
+      }, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        }
+      });
+    } catch (error) {
+      setError(error.response.data.message);
+    }
     onClose();
   };
 
@@ -155,6 +170,7 @@ export default function Projects(props) {
         onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
+          {error && <div style={{ color: "red" }}>{error}</div>}{" "}
           <ModalHeader>Create your Course</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
@@ -176,6 +192,11 @@ export default function Projects(props) {
             <FormControl mt={4}>
               <FormLabel>Course End Time</FormLabel>
               <Input type='datetime-local' placeholder='S, T, T 10:00-11:00 A.M' color={textColorPrimary} onChange={e => setCourseEndTimeDate(e.target.value)} />
+            </FormControl>
+
+            <FormControl mt={4}>
+              <FormLabel>Course Duration in mintues</FormLabel>
+              <Input type='number' placeholder='60' color={textColorPrimary} onChange={e => setCourseDuration(e.target.value)} />
             </FormControl>
 
             <FormControl mt={4}>

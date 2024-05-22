@@ -42,6 +42,11 @@ function Register() {
     }
   }, []);
 
+  const INSRUMENT_SERVICE = "http://localhost:3000";
+  const ONLY_LETTERS = /^[a-zA-Z]+$/;
+  const USERNAME_REGEX = /^[a-zA-Z0-9_\.]+$/;
+  const EMAIL_REGEX = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+  const PASSWORD_REGEX = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -52,32 +57,54 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // validating input
+    if (firstName === '' || firstName === ' ' || !ONLY_LETTERS.test(firstName)) {
+      setError("A valid (only letters) First Name is required");
+      return;
+    }
+    if (lastName === '' || lastName === ' ' || !ONLY_LETTERS.test(lastName)) {
+      setError("A valid (only letters) Last Name is required");
+      return;
+    }
+    if (email === '' || email === ' ' || !EMAIL_REGEX.test(email)) {
+      setError("A valid email is required");
+      return;
+    }
+    if (username === '' || username === ' ' || !USERNAME_REGEX.test(username)) {
+      setError("Usernames are required and must only contain letters, digits, dots, and underscores");
+      return;
+    }
+    if (password === '' || password === ' ' || !PASSWORD_REGEX.test(password)) {
+      setError("A password is required and must contain at least one special character and at least one number");
+      return;
+    }
+
     try {
-      const register = await axios.post("http://localhost:3000/auth/register", {
+      // Requesting the instrument-service auth registration endpoint.
+      const register = await axios.post(`${INSRUMENT_SERVICE}/auth/register`, {
         "username": username,
         "password": password,
         "firstName": firstName,
         "lastName": lastName,
         "email": email,
       });
-      const registerData = register.data;
-      console.log(registerData);
-      // you have to login to get the token
-      const login = await axios.post("http://localhost:3000/auth/register", {
+      // You have to login to get the token.
+      const login = await axios.post(`${INSRUMENT_SERVICE}/auth/login`, {
         "username": username,
         "password": password,
       });
-      const accessToken = login.data.accessToken
-      setToken(accessToken);
-      console.log(accessToken);
-      localStorage.setItem("token", accessToken);
+      // Getting the token.
+      setToken(login.data.accessToken);
+      localStorage.setItem("token", login.data.accessToken);
+      localStorage.setItem("userId", login.data.userId);
+      // Redirect to the main page.
       history.push('/admin');
     } catch (error) {
-      console.log("Registeration Error ", error);
+      // Catching any expections from the backend
       setToken(null);
       localStorage.removeItem("token");
       if (error.response && error.response.data) {
-        setError(error.response.data); // Set the error message if present in the error response
+        setError(error.response.data.message); // Set the error message if present in the error response
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
@@ -140,7 +167,7 @@ function Register() {
               fontWeight='500'
               color={textColor}
               mb='8px'>
-              First Name Name<Text color={brandStars}>*</Text>
+              First Name<Text color={brandStars}>*</Text>
             </FormLabel>
             <Input
               isRequired={true}
