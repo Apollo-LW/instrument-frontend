@@ -40,6 +40,7 @@ import Menu from "components/menu/MainMenu";
 import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import axios from "axios";
+
 export default function ColumnsTable(props) {
   const { columnsData, tableData } = props;
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");

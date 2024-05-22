@@ -56,7 +56,6 @@ export default function Settings() {
     }
 
     if (response.data) {
-      console.log(response.data);
       setTasks(response.data);
     }
   }
@@ -69,7 +68,7 @@ export default function Settings() {
   // Chakra Color Mode
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-      <Menu m={10}>
+      <Menu mb='20px'>
         <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
           Your Courses
         </MenuButton>
@@ -83,11 +82,11 @@ export default function Settings() {
         mb='20px'
         columns={{ sm: 1, md: 2 }}
         spacing={{ base: "20px", xl: "20px" }}>
+        <CheckTable columnsData={columnsDataCheck} tableData={tasks} />
         <DevelopmentTable 
           columnsData={columnsDataDevelopment}
           tableData={tableDataDevelopment}
         />
-        <CheckTable columnsData={columnsDataCheck} tableData={tableDataCheck} />
         <ColumnsTable
           columnsData={columnsDataColumns}
           tableData={tableDataColumns}
