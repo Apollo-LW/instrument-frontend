@@ -15,9 +15,37 @@ import tableDataDevelopment from "views/admin/dataTables/variables/tableDataDeve
 import tableDataCheck from "views/admin/dataTables/variables/tableDataCheck.json";
 import tableDataColumns from "views/admin/dataTables/variables/tableDataColumns.json";
 import tableDataComplex from "views/admin/dataTables/variables/tableDataComplex.json";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function Settings() {
+
+  const history = useHistory();
+  const INSRUMENT_SERVICE = "http://localhost:3000";
+  const [courses, setCourses] = useState([]);
+
+  const fetchUserCourses = async () => {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/course/user/list/${localStorage.getItem("userId")}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+    
+    if (response.status == 401) {
+      history.push("/auth");
+      return;
+    }
+    
+    if (response.data) {
+      setCourses(response.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserCourses();
+  }, []);
+
   // Chakra Color Mode
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
@@ -26,9 +54,9 @@ export default function Settings() {
           Your Courses
         </MenuButton>
         <MenuList>
-          <MenuItem>Course A</MenuItem>
-          <MenuItem>Course B</MenuItem>
-          <MenuItem>Course C</MenuItem>
+          {courses.map((course) => (
+              <MenuItem key={course._id}>{course.name}</MenuItem>
+            ))}
         </MenuList>
       </Menu>
       <SimpleGrid
