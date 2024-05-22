@@ -10,11 +10,15 @@ import {
   Thead,
   Tr,
   useColorModeValue,
+  Button,
+  Menu, 
+  MenuButton, 
+  MenuItem, 
+  MenuList
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card";
-import { AndroidLogo, AppleLogo, WindowsLogo } from "components/icons/Icons";
-import Menu from "components/menu/MainMenu";
+import { ChevronDownIcon } from '@chakra-ui/icons'
 import React, { useMemo } from "react";
 import {
   useGlobalFilter,
@@ -24,7 +28,7 @@ import {
 } from "react-table";
 
 export default function DevelopmentTable(props) {
-  const { columnsData, tableData } = props;
+  const { columnsData, tableData, userTasks } = props;
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
@@ -66,7 +70,16 @@ export default function DevelopmentTable(props) {
           lineHeight='100%'>
           Course Task Table
         </Text>
-        <Menu />
+        <Menu>
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+            Your Course Task
+          </MenuButton>
+          <MenuList>
+            {userTasks.map((task) => (
+                <MenuItem key={task.id}>{task.name}</MenuItem>
+              ))}
+          </MenuList>
+        </Menu>
       </Flex>
       <Table {...getTableProps()} variant='simple' color='gray.500' mb='24px'>
         <Thead>
@@ -103,50 +116,13 @@ export default function DevelopmentTable(props) {
                         {cell.value}
                       </Text>
                     );
-                  } else if (cell.column.Header === "TECH") {
-                    data = (
-                      <Flex align='center'>
-                        {cell.value.map((item, key) => {
-                          if (item === "apple") {
-                            return (
-                              <AppleLogo
-                                key={key}
-                                color={iconColor}
-                                me='16px'
-                                h='18px'
-                                w='15px'
-                              />
-                            );
-                          } else if (item === "android") {
-                            return (
-                              <AndroidLogo
-                                key={key}
-                                color={iconColor}
-                                me='16px'
-                                h='18px'
-                                w='16px'
-                              />
-                            );
-                          } else if (item === "windows") {
-                            return (
-                              <WindowsLogo
-                                key={key}
-                                color={iconColor}
-                                h='18px'
-                                w='19px'
-                              />
-                            );
-                          }
-                        })}
-                      </Flex>
-                    );
-                  } else if (cell.column.Header === "DATE") {
+                  } else if (cell.column.Header === "DUE DATE") {
                     data = (
                       <Text color={textColor} fontSize='sm' fontWeight='700'>
                         {cell.value}
                       </Text>
                     );
-                  } else if (cell.column.Header === "PROGRESS") {
+                  } else if (cell.column.Header === "DESCRIPTION") {
                     data = (
                       <Flex align='center'>
                         <Text

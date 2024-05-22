@@ -19,7 +19,6 @@ import {
 
 // Custom components
 import Card from "components/card/Card";
-import Menu from "components/menu/MainMenu";
 export default function ColumnsTable(props) {
   const { columnsData, tableData } = props;
 
@@ -60,9 +59,8 @@ export default function ColumnsTable(props) {
           fontSize='22px'
           fontWeight='700'
           lineHeight='100%'>
-          4-Column Table
+          Users in Course
         </Text>
-        <Menu />
       </Flex>
       <Table {...getTableProps()} variant='simple' color='gray.500' mb='24px'>
         <Thead>

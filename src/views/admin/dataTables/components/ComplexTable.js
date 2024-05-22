@@ -125,7 +125,7 @@ export default function ColumnsTable(props) {
           fontSize='22px'
           fontWeight='700'
           lineHeight='100%'>
-          Tasks Table
+          Course Asset Table
         </Text>
         <Menu />
       </Flex>

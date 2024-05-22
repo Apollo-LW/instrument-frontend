@@ -55,6 +55,8 @@ export default function Settings() {
       return;
     }
 
+    console.log(tasks);
+
     if (response.data) {
       setTasks(response.data);
     }
@@ -86,6 +88,12 @@ export default function Settings() {
         <DevelopmentTable 
           columnsData={columnsDataDevelopment}
           tableData={tableDataDevelopment}
+          userTasks={tasks.map(task => (
+            {
+              name: task.name,
+              id: task._id
+            }
+          ))}
         />
         <ColumnsTable
           columnsData={columnsDataColumns}

@@ -4,17 +4,17 @@ export const columnsDataDevelopment = [
     accessor: "name",
   },
   {
-    Header: "TECH",
-    accessor: "tech",
+    Header: "STATUS",
+    accessor: "status",
   },
   {
-    Header: "DATE",
-    accessor: "date",
-  },
+    Header: "DUE DATE",
+    accessor: "dueDate",
+  }, 
   {
-    Header: "PROGRESS",
-    accessor: "progress",
-  },
+    Header: "DESCRIPTION",
+    accessor: "desciption",
+  }
 ];
 
 export const columnsDataCheck = [
