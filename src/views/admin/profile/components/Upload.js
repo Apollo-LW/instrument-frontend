@@ -23,6 +23,7 @@ export default function Upload(props) {
   const textColorSecondary = "gray.400";
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadStatus, setUploadStatus] = useState("");
+  const ASSET_MANAGMENT = "http://localhost:3002";
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     acceptedFiles.forEach((file) => {
@@ -46,7 +47,7 @@ export default function Upload(props) {
       formData.append("file", file);
     });
     try {
-      const response = await axios.post("http://localhost:3002/api/files", formData);
+      const response = await axios.post(`${ASSET_MANAGMENT}/api/files`, formData);
       console.log(response.data);
       setUploadStatus(`Successfully Uploaded ${selectedFiles.length} assets :)`);
       setSelectedFiles([]);

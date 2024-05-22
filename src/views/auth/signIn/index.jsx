@@ -36,6 +36,7 @@ import { AuthContext } from "contexts/AuthContext";
 
 function SignIn() {
   const history = useHistory();
+  const INSRUMENT_SERVICE = "http://localhost:3000";
   useEffect(() => {
     if (localStorage.getItem("token") != null) {
       localStorage.removeItem("token");
@@ -50,25 +51,39 @@ function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // validating input is not empty
+    if (username === '' || username === ' ') {
+      setError("Username is empty");
+      return;
+    }
+    if (password === '' || username === ' ') {
+      setError("Password is empty");
+      return;
+    }
+    
     try {
-      const response = await axios.post("http://localhost:3000/auth/login", {
+      // Requesting the instrument-service auth login endpoint
+      const response = await axios.post(`${INSRUMENT_SERVICE}/auth/login`, {
         "username": username,
         "password": password
       });
 
+      // Getting the response back from the service
       const data = response.data;
+      // Setting the JWT token for the user
       setToken(data.accessToken);
       localStorage.setItem("token", data.accessToken);
       localStorage.setItem("userId", data.userId);
 
+      // Redirect to the main page.
       history.push('/admin')
     } catch (error) {
-      console.log("Authentication error > ", error);
+      // Catching any expections from the backend
       setToken(null);
       localStorage.removeItem("token");
       localStorage.removeItem("username");
       if (error.response && error.response.data) {
-        setError(error.response.data); // Set the error message if present in the error response
+        setError(error.response.data.message); // Set the error message if present in the error response
       } else {
         setError("An unexpected error occurred. Please try again.");
       }

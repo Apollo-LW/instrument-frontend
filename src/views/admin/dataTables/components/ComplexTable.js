@@ -57,28 +57,36 @@ export default function ColumnsTable(props) {
   const [dueDate, setDueDate] = useState("");
   const [status, setStatus] = useState("");
   const [description, setDescription] = useState("");
+  const [error, setError] = useState("");
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
+  const INSRUMENT_SERVICE = "http://localhost:3000";
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const createTask = async (e) => {
-    console.log(taskName);
-    console.log(dueDate);
-    console.log(status);
-    console.log(description);
-    const response = await axios.post(`http://localhost:3000/task`, {
-      "name": taskName,
-      "description": description,
-      "dueDate": dueDate,
-      "creatorID": localStorage.getItem("userId"),
-      "status": status
-    }, {
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("token")}`,
-      }
-    });
-    console.log(response.data);
+    if (taskName === '' || taskName === ' ') {
+      setError("A valid name is required");
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${INSRUMENT_SERVICE}/task`, {
+        "name": taskName,
+        "description": description,
+        "dueDate": dueDate,
+        "creatorID": localStorage.getItem("userId"),
+        "status": status
+      }, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        }
+      });
+    } catch (error) {
+      setError(error.response.data.message);
+    }
+   
+
     onClose();
   }
 
@@ -241,6 +249,7 @@ export default function ColumnsTable(props) {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Create your Task</ModalHeader>
+          {error && <div style={{ color: "red" }}>{error}</div>}{" "}
           <ModalCloseButton />
           <ModalBody pb={6}>
             <FormControl>

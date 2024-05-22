@@ -9,50 +9,74 @@ import Information from "views/admin/profile/components/Information";
 // Assets
 export default function GeneralInformation(props) {
 
+  const INSRUMENT_SERVICE = "http://localhost:3000";
+  const ONLY_LETTERS = /^[a-zA-Z]+$/;
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [email, setEmail] = useState("");
 
   const fetchProfile = async () => {
-    const response = await axios.get(`http://localhost:3000/user/${localStorage.getItem("userId")}`, {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/user/${localStorage.getItem("userId")}`, {
       headers: {
         "Authorization" : `Bearer ${localStorage.getItem("token")}`,
       }
     });
 
-    const x = response.data;
-    if (x) {
-      setFirstName(x.firstName);
-      setLastName(x.lastName);
-      setEmail(x.email);
+    if (response.data) {
+      setFirstName(response.data.firstName);
+      setLastName(response.data.lastName);
+      setEmail(response.data.email);
     }
   };
 
   const updateFirstName = async () => {
-    console.log(updateFirstName);
-    const response = await axios.patch(`http://localhost:3000/user/${localStorage.getItem("userId")}`, {
-        "firstName": firstName,
-    }, {
-      "Authorization" : `Bearer ${localStorage.getItem("token")}`,
-    });
+    if (firstName === '' || firstName === ' ' || !ONLY_LETTERS.test(firstName)) {
+      setError("A valid (only letters) First Name is required");
+      return;
+    }
+    try {
+      const response = await axios.patch(`${INSRUMENT_SERVICE}/user/${localStorage.getItem("userId")}`, {
+          "firstName": firstName,
+      }, {
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+      });
 
-    const x = response.data;
-    if (x) {
-      console.log(x);
+      if (response.data) 
+        setSuccess("Updated your first name");
+    } catch (error) {
+      // Catching any expections from the backend
+      if (error.response && error.response.data) {
+        setError(error.response.data.message); // Set the error message if present in the error response
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     }
   }
 
   const updateLastName = async () => {
-    console.log(updateFirstName);
-    const response = await axios.patch(`http://localhost:3000/user/${localStorage.getItem("userId")}`, {
-        "lastName": lastName,
-    }, {
-      "Authorization" : `Bearer ${localStorage.getItem("token")}`,
-    });
+    if (lastName === '' || lastName === ' ' || !ONLY_LETTERS.test(lastName)) {
+      setError("A valid (only letters) Last Name is required");
+      return;
+    }
 
-    const x = response.data;
-    if (x) {
-      console.log(x);
+    try {
+      const response = await axios.patch(`${INSRUMENT_SERVICE}/user/${localStorage.getItem("userId")}`, {
+          "lastName": lastName,
+      }, {
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+      });
+
+      if (response.data)
+        setSuccess("Updated your last name");
+    } catch (error) {
+       // Catching any expections from the backend
+       if (error.response && error.response.data) {
+        setError(error.response.data.message); // Set the error message if present in the error response
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     }
   }
 
@@ -82,6 +106,8 @@ export default function GeneralInformation(props) {
       "The future belongs to the curious. The ones who are not afraid to try it, explore it, poke at it, question it and turn it inside out"
       </Text>
       <SimpleGrid columns='1' gap='20px'>
+        {error && <div style={{ color: "red" }}>{error}</div>}{" "}
+        {success && <div style={{ color: "green" }}>{success}</div>}{" "}
         <Information
           boxShadow={cardShadow}
           title='First Name'
