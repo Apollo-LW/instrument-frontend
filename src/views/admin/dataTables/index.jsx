@@ -24,6 +24,7 @@ export default function Settings() {
   const history = useHistory();
   const INSRUMENT_SERVICE = "http://localhost:3000";
   const [courses, setCourses] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
   const fetchUserCourses = async () => {
     const response = await axios.get(`${INSRUMENT_SERVICE}/course/user/list/${localStorage.getItem("userId")}`, {
@@ -42,8 +43,27 @@ export default function Settings() {
     }
   };
 
+  const fetchUserTasks = async () => {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/task/user/list/${localStorage.getItem("userId")}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.status == 401) {
+      history.push("/auth");
+      return;
+    }
+
+    if (response.data) {
+      console.log(response.data);
+      setTasks(response.data);
+    }
+  }
+
   useEffect(() => {
     fetchUserCourses();
+    fetchUserTasks();
   }, []);
 
   // Chakra Color Mode
