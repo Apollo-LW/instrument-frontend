@@ -25,6 +25,32 @@ export default function Settings() {
   const INSRUMENT_SERVICE = "http://localhost:3000";
   const [courses, setCourses] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [selectedCourseId, setSelectedCourseId] = useState(0);
+  const [selectedCourseName, setSelectedCourseName] = useState("");
+  const [selectedCourseTasks, setSelectedCourseTasks] = useState([]);
+
+  const fetchCourseName = async () => {
+    if (selectedCourseId == 0) {
+      return;
+    }
+
+    const response = await axios.get(`${INSRUMENT_SERVICE}/course/name/${selectedCourseId}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.status == 401) {
+      history.push("/auth");
+      return;
+    }
+
+    console.log(response);
+
+    if (response.data) {
+      setSelectedCourseName(response.data);
+    }
+  }
 
   const fetchUserCourses = async () => {
     const response = await axios.get(`${INSRUMENT_SERVICE}/course/user/list/${localStorage.getItem("userId")}`, {
@@ -43,6 +69,28 @@ export default function Settings() {
     }
   };
 
+  const fetchCourseTasks = async () => {
+    if (selectedCourseId == 0) {
+      return;
+    }
+
+    const response = await axios.get(`${INSRUMENT_SERVICE}/course/task/list/${localStorage.getItem("userId")}/${selectedCourseId}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.status == 401) {
+      history.push("/auth");
+      return;
+    }
+
+    if (response.data) {
+      setSelectedCourseTasks(response.data);
+      console.log(response.data);
+    }
+  }
+
   const fetchUserTasks = async () => {
     const response = await axios.get(`${INSRUMENT_SERVICE}/task/user/list/${localStorage.getItem("userId")}`, {
       headers: {
@@ -55,28 +103,30 @@ export default function Settings() {
       return;
     }
 
-    console.log(tasks);
-
     if (response.data) {
       setTasks(response.data);
     }
-  }
+  };
 
   useEffect(() => {
     fetchUserCourses();
     fetchUserTasks();
-  }, []);
+    fetchCourseTasks();
+  }, [selectedCourseId]);
 
   // Chakra Color Mode
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-      <Menu mb='20px'>
-        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-          Your Courses
+      <Menu m='25px'>
+        <MenuButton m='25px' as={Button} rightIcon={<ChevronDownIcon />}>
+          Select Course
         </MenuButton>
         <MenuList>
           {courses.map((course) => (
-              <MenuItem key={course._id}>{course.name}</MenuItem>
+              <MenuItem onClick={() => {
+                setSelectedCourseId(course._id);
+                setSelectedCourseName(course.name);
+              }} key={course._id}>{course.name}</MenuItem>
             ))}
         </MenuList>
       </Menu>
@@ -86,16 +136,17 @@ export default function Settings() {
         spacing={{ base: "20px", xl: "20px" }}>
         <CheckTable columnsData={columnsDataCheck} tableData={tasks} />
         <DevelopmentTable 
+          currentCouseName={selectedCourseName}
+          currentCourseId={selectedCourseId}
           columnsData={columnsDataDevelopment}
           tableData={tableDataDevelopment}
-          userTasks={tasks.map(task => (
-            {
+          userTasksToAdd={tasks.map(task => ({
               name: task.name,
               id: task._id
-            }
-          ))}
+            }))}
         />
         <ColumnsTable
+          currentCourseId={selectedCourseId}
           columnsData={columnsDataColumns}
           tableData={tableDataColumns}
         />

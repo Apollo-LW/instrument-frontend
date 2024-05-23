@@ -19,16 +19,19 @@ import {
 // Custom components
 import Card from "components/card/Card";
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import React, { useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import axios from "axios";
 import {
   useGlobalFilter,
   usePagination,
   useSortBy,
   useTable,
 } from "react-table";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function DevelopmentTable(props) {
-  const { columnsData, tableData, userTasks } = props;
+  const { columnsData, tableData, userTasksToAdd, currentCourseId, currentCouseName } = props;
+  const INSRUMENT_SERVICE = "http://localhost:3000";
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
@@ -68,15 +71,15 @@ export default function DevelopmentTable(props) {
           fontSize='22px'
           fontWeight='700'
           lineHeight='100%'>
-          Course Task Table
+          Course <Text display='inline-block' color="green">{currentCouseName ? currentCouseName : ""} </Text> Task Table
         </Text>
         <Menu>
           <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-            Your Course Task
+            Add Tasks to your course
           </MenuButton>
           <MenuList>
-            {userTasks.map((task) => (
-                <MenuItem key={task.id}>{task.name}</MenuItem>
+            {userTasksToAdd.map((task) => (
+                <MenuItem onClick={() => alert(task.id)} key={task.id}>{task.name}</MenuItem>
               ))}
           </MenuList>
         </Menu>

@@ -20,7 +20,7 @@ import {
 // Custom components
 import Card from "components/card/Card";
 export default function ColumnsTable(props) {
-  const { columnsData, tableData } = props;
+  const { columnsData, tableData, ColumnsTable } = props;
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
