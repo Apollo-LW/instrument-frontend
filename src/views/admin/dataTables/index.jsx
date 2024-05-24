@@ -39,12 +39,12 @@ export default function Settings() {
   const [selectedCourseEndTime, setSelectedCourseEndTime] = useState("");
   const [selectedCourseRepeated, setSelectedCourseRepeated] = useState([]);
 
-  const fetchCourseName = async () => {
-    if (selectedCourseId == 0) {
+  const fetchSelectedCourse = async (courseId) => {
+    if (courseId == 0) {
       return;
     }
 
-    const response = await axios.get(`${INSRUMENT_SERVICE}/course/${selectedCourseId}`, {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/course/${courseId}`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`,
       }
@@ -57,7 +57,7 @@ export default function Settings() {
 
     if (response.data) {
       const course = response.data;
-      console.log(course);
+      setSelectedCourseId(course._id);
       setSelectedCourseName(course.name);
       setSelectedCourseDescription(course.courseDescription);
       setSelectedCourseDuration(course.duration);
@@ -155,7 +155,7 @@ export default function Settings() {
         </MenuButton>
         <MenuList>
           {courses.map((course) => (
-              <MenuItem onClick={fetchCourseName} key={course._id}>{course.name}</MenuItem>
+              <MenuItem onClick={() => fetchSelectedCourse(course._id)} key={course._id}>{course.name}</MenuItem>
             ))}
         </MenuList>
       </Menu>
