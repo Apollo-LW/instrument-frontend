@@ -173,7 +173,7 @@ export default function ColumnsTable(props) {
                   } else if (cell.column.Header === "Last Role Update") {
                     data = (
                       <Text color={textColor} fontSize='sm' fontWeight='700'>
-                        {new Date(cell.value).toDateString()}
+                        {new Date(cell.value).toLocaleString()}
                       </Text>
                     );
                   }

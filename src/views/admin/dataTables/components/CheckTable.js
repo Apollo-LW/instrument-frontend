@@ -199,7 +199,7 @@ export default function CheckTable(props) {
                   } else if (cell.column.Header === "DUE DATE") {
                     data = (
                       <Text color={textColor} fontSize='sm' fontWeight='700'>
-                        {new Date(cell.value).toDateString()}
+                        {new Date(cell.value).toLocaleString()}
                       </Text>
                     );
                   } else if (cell.column.Header === "DESCRIPTION") {

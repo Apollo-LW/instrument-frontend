@@ -1,5 +1,5 @@
 // Chakra imports
-import { Box, Button, Menu, MenuButton, MenuItem, MenuList, SimpleGrid } from "@chakra-ui/react";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, SimpleGrid, Flex, Text, useColorModeValue } from "@chakra-ui/react";
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import DevelopmentTable from "views/admin/dataTables/components/DevelopmentTable";
 import CheckTable from "views/admin/dataTables/components/CheckTable";
@@ -23,19 +23,28 @@ export default function Settings() {
 
   const history = useHistory();
   const INSRUMENT_SERVICE = "http://localhost:3000";
+  const textColorSecondary = "gray.400";
+  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
+  
   const [courses, setCourses] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [selectedCourseId, setSelectedCourseId] = useState(0);
-  const [selectedCourseName, setSelectedCourseName] = useState("");
   const [selectedCourseTasks, setSelectedCourseTasks] = useState([]);
   const [users, setUsers] = useState([]);
+
+  const [selectedCourseId, setSelectedCourseId] = useState(0);
+  const [selectedCourseName, setSelectedCourseName] = useState("");
+  const [selectedCourseDescription, setSelectedCourseDescription] = useState("");
+  const [selectedCourseDuration, setSelectedCourseDuration] = useState("");
+  const [selectedCourseStartTime, setSelectedCourseStartTime] = useState("");
+  const [selectedCourseEndTime, setSelectedCourseEndTime] = useState("");
+  const [selectedCourseRepeated, setSelectedCourseRepeated] = useState([]);
 
   const fetchCourseName = async () => {
     if (selectedCourseId == 0) {
       return;
     }
 
-    const response = await axios.get(`${INSRUMENT_SERVICE}/course/name/${selectedCourseId}`, {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/course/${selectedCourseId}`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`,
       }
@@ -47,7 +56,14 @@ export default function Settings() {
     }
 
     if (response.data) {
-      setSelectedCourseName(response.data);
+      const course = response.data;
+      console.log(course);
+      setSelectedCourseName(course.name);
+      setSelectedCourseDescription(course.courseDescription);
+      setSelectedCourseDuration(course.duration);
+      setSelectedCourseStartTime(course.startTime);
+      setSelectedCourseEndTime(course.endTime);
+      setSelectedCourseRepeated(course.repeatedDays);
     }
   }
 
@@ -139,13 +155,48 @@ export default function Settings() {
         </MenuButton>
         <MenuList>
           {courses.map((course) => (
-              <MenuItem onClick={() => {
-                setSelectedCourseId(course._id);
-                setSelectedCourseName(course.name);
-              }} key={course._id}>{course.name}</MenuItem>
+              <MenuItem onClick={fetchCourseName} key={course._id}>{course.name}</MenuItem>
             ))}
         </MenuList>
       </Menu>
+      {
+        selectedCourseId != 0 && (
+        <Flex m='20px' w='max-content' mx='auto' mt='26px'>
+          <Flex mx='auto' me='60px' align='center' direction='column'>
+            <Text color={textColorPrimary} fontSize='2xl' fontWeight='400'>
+              Course Name
+            </Text>
+            <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
+              {selectedCourseName}
+            </Text>
+            <Text color={textColorSecondary} fontSize='sm' fontWeight='400'>
+              {selectedCourseDescription}
+            </Text>
+          </Flex>
+          <Flex mx='auto' me='60px' align='center' direction='column'>
+            <Text color={textColorPrimary} fontSize='2xl' fontWeight='400'>
+                Course Start and End Time
+            </Text>
+            <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
+              {new Date(selectedCourseStartTime).toLocaleString()}
+            </Text>
+            <Text color={textColorSecondary} fontSize='sm' fontWeight='400'>
+              {new Date(selectedCourseEndTime).toLocaleString()}
+            </Text>
+          </Flex>
+          <Flex mx='auto' align='center' direction='column'>
+            <Text color={textColorPrimary} fontSize='2xl' fontWeight='400'>
+              Course Duration
+            </Text>
+            <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
+              {selectedCourseDuration} mins
+            </Text>
+            <Text color={textColorSecondary} fontSize='sm' fontWeight='400'>  
+              {selectedCourseRepeated.toString()}
+            </Text>
+          </Flex>
+        </Flex>)
+      }
       <SimpleGrid
         mb='20px'
         columns={{ sm: 1, md: 2 }}
