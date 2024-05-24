@@ -28,6 +28,7 @@ export default function Settings() {
   const [selectedCourseId, setSelectedCourseId] = useState(0);
   const [selectedCourseName, setSelectedCourseName] = useState("");
   const [selectedCourseTasks, setSelectedCourseTasks] = useState([]);
+  const [users, setUsers] = useState([]);
 
   const fetchCourseName = async () => {
     if (selectedCourseId == 0) {
@@ -105,10 +106,29 @@ export default function Settings() {
     }
   };
 
+  const fetchCourseUsernames = async () => {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/course/list/users/${selectedCourseId}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.status == 401) {
+      history.push("/auth");
+      return;
+    }
+
+    if (response.data) {
+      console.log(response.data);
+      setUsers(response.data);
+    }
+  };
+
   useEffect(() => {
     fetchUserCourses();
     fetchUserTasks();
     fetchCourseTasks();
+    fetchCourseUsernames();
   }, [selectedCourseId]);
 
   // Chakra Color Mode
@@ -144,6 +164,7 @@ export default function Settings() {
         />
         <ColumnsTable
           currentCourseId={selectedCourseId}
+          currentCourseName={selectedCourseName}
           columnsData={columnsDataColumns}
           tableData={tableDataColumns}
         />

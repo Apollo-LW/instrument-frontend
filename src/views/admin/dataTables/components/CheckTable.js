@@ -35,7 +35,6 @@ import {
 // Custom components
 import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
 import Card from "components/card/Card";
-import Menu from "components/menu/MainMenu";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import axios from "axios";
 
@@ -56,8 +55,6 @@ export default function CheckTable(props) {
   const [desciption, setDesciption] = useState("");
   const [error, setError] = useState("");
   const [taskIsExam, setTaskIsExam] = useState(false);
-
-  
 
   const INSRUMENT_SERVICE = "http://localhost:3000";
 
@@ -81,12 +78,11 @@ export default function CheckTable(props) {
           "Authorization": `Bearer ${localStorage.getItem("token")}`,
         }
       });
+      onClose();
+      setError("");
     } catch (error) {
       setError(error.response.data.message);
     }
-   
-
-    onClose();
   }
 
   const tableInstance = useTable(
@@ -125,7 +121,6 @@ export default function CheckTable(props) {
           lineHeight='100%'>
           All of Your Task
         </Text>
-        <Menu />
       </Flex>
       <Table {...getTableProps()} variant='simple' color='gray.500' mb='24px'>
         <Thead>
