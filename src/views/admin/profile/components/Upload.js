@@ -6,6 +6,7 @@ import {
   Icon,
   Input,
   Text,
+  Checkbox,
   useColorModeValue,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -22,8 +23,10 @@ export default function Upload(props) {
   const brandColor = useColorModeValue("brand.500", "white");
   const textColorSecondary = "gray.400";
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [isAssetPublic, setIsAssetPublic] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
   const ASSET_MANAGMENT = "http://localhost:3002";
+  const INSRUMENT_SERVICE = "http://localhost:3000";
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     acceptedFiles.forEach((file) => {
@@ -41,17 +44,35 @@ export default function Upload(props) {
   const borderColor = useColorModeValue("secondaryGray.100", "whiteAlpha.100");
 
   const uploadFile = async (e) => {
+    if (selectedFiles.length == 0) {
+      setUploadStatus("Upload Failed!, please select at least one file");
+      return;
+    }
     setUploadStatus("Uploading...");
     const formData = new FormData();
     selectedFiles.forEach((file) => {
       formData.append("file", file);
     });
     try {
-      const response = await axios.post(`${ASSET_MANAGMENT}/api/files`, formData);
-      console.log(response.data);
+      const responses = await axios.post(`${ASSET_MANAGMENT}/api/files`, formData);
+      Promise.all(responses.data.map(async (response) => {
+        const userAdd = await axios.post(`${INSRUMENT_SERVICE}/asset`, {
+          name: response.filename,
+          creatorId: localStorage.getItem("userId"),
+          assetId: response.id,
+          isPublic: isAssetPublic
+        }, {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          }
+        });
+        console.log(userAdd.data);
+      }));
       setUploadStatus(`Successfully Uploaded ${selectedFiles.length} assets :)`);
       setSelectedFiles([]);
+      setIsAssetPublic(false);
     } catch (e) {
+      console.log(e);
       setUploadStatus("Upload Failed!");
     }
   }
@@ -101,10 +122,11 @@ export default function Upload(props) {
             fontWeight='bold'
             textAlign='start'
             fontSize='2xl'
-            color={uploadStatus == "Upload Failed!" ? "red" : "green"}
+            color={uploadStatus.includes("Upload Failed!") ? "red" : "green"}
             mt={{ base: "20px", "2xl": "50px" }}>
             {uploadStatus}
           </Text>
+          <Checkbox colorScheme="green" isChecked={isAssetPublic} onChange={e => setIsAssetPublic(e.target.checked)}>Do you wanna make this public</Checkbox>
           <Flex w='100%'>
             <Button
               me='100%'
