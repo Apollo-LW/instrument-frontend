@@ -45,8 +45,6 @@ export default function Settings() {
       return;
     }
 
-    console.log(response);
-
     if (response.data) {
       setSelectedCourseName(response.data);
     }
@@ -87,7 +85,6 @@ export default function Settings() {
 
     if (response.data) {
       setSelectedCourseTasks(response.data);
-      console.log(response.data);
     }
   }
 
@@ -136,7 +133,7 @@ export default function Settings() {
         spacing={{ base: "20px", xl: "20px" }}>
         <CheckTable columnsData={columnsDataCheck} tableData={tasks} />
         <DevelopmentTable 
-          currentCouseName={selectedCourseName}
+          currentCourseName={selectedCourseName}
           currentCourseId={selectedCourseId}
           columnsData={columnsDataDevelopment}
           userTasksToAdd={tasks.map(task => ({

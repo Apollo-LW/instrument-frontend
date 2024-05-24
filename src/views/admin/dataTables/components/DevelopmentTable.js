@@ -15,8 +15,11 @@ import {
   Menu, 
   MenuButton, 
   MenuItem, 
-  MenuList
+  MenuList,
 } from "@chakra-ui/react";
+
+import { useToast } from "@chakra-ui/react";
+
 // Custom components
 import Card from "components/card/Card";
 import { ChevronDownIcon } from '@chakra-ui/icons'
@@ -32,13 +35,36 @@ import {
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function DevelopmentTable(props) {
-  const { columnsData, userTasksToAdd, currentCourseId, currentCouseName, currentCourseTask } = props;
+  const { columnsData, userTasksToAdd, currentCourseId, currentCourseName, currentCourseTask } = props;
   const INSRUMENT_SERVICE = "http://localhost:3000";
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => currentCourseTask, [currentCourseTask]);
+  const toast = useToast();
 
-  console.log(currentCourseTask)
+
+  const addTaskToCourse = async (courseId, taskId) => {
+    const response = await axios.post(`${INSRUMENT_SERVICE}/course/task`, {
+      "courseId": courseId,
+      "userId": localStorage.getItem("userId"),
+      "taskId": taskId
+    }, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.status == 401) {
+      history.push("/auth");
+      return;
+    }
+
+    if (response.status == 201) {
+      alert("Task Added Successfully");
+    } else {
+      alert("Task Failed To Add");
+    }
+  };
 
   const tableInstance = useTable(
     {
@@ -75,7 +101,7 @@ export default function DevelopmentTable(props) {
           fontSize='22px'
           fontWeight='700'
           lineHeight='100%'>
-          Course <Text display='inline-block' color="green">{currentCouseName ? currentCouseName : ""} </Text> Task Table
+          Course <Text display='inline-block' color="green">{currentCourseName ? currentCourseName : ""} </Text> Task Table
         </Text>
         <Menu>
           <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
@@ -83,7 +109,7 @@ export default function DevelopmentTable(props) {
           </MenuButton>
           <MenuList>
             {userTasksToAdd.map((task) => (
-                <MenuItem onClick={() => alert(task.id)} key={task.id}>{task.name}</MenuItem>
+                <MenuItem onClick={() => addTaskToCourse(currentCourseId, task.id)} key={task.id}>{task.name}</MenuItem>
               ))}
           </MenuList>
         </Menu>
