@@ -42,20 +42,16 @@ export const columnsDataCheck = [
 
 export const columnsDataColumns = [
   {
-    Header: "NAME",
-    accessor: "name",
+    Header: "USERNAME",
+    accessor: "username",
   },
   {
-    Header: "PROGRESS",
-    accessor: "progress",
+    Header: "ROLE",
+    accessor: "role",
   },
   {
-    Header: "QUANTITY",
-    accessor: "quantity",
-  },
-  {
-    Header: "DATE",
-    accessor: "date",
+    Header: "Last Role Update",
+    accessor: "lastUpdated",
   },
 ];
 

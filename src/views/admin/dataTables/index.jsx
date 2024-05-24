@@ -73,7 +73,7 @@ export default function Settings() {
       return;
     }
 
-    const response = await axios.get(`${INSRUMENT_SERVICE}/course/task/list/${localStorage.getItem("userId")}/${selectedCourseId}`, {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/course/task/list/${selectedCourseId}`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`,
       }
@@ -119,7 +119,6 @@ export default function Settings() {
     }
 
     if (response.data) {
-      console.log(response.data);
       setUsers(response.data);
     }
   };
@@ -166,7 +165,7 @@ export default function Settings() {
           currentCourseId={selectedCourseId}
           currentCourseName={selectedCourseName}
           columnsData={columnsDataColumns}
-          tableData={tableDataColumns}
+          tableData={users}
         />
         <ComplexTable // Course Task list
           columnsData={columnsDataComplex}

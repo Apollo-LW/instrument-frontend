@@ -40,29 +40,27 @@ export default function DevelopmentTable(props) {
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => currentCourseTask, [currentCourseTask]);
-  const toast = useToast();
-
 
   const addTaskToCourse = async (courseId, taskId) => {
-    const response = await axios.post(`${INSRUMENT_SERVICE}/course/task`, {
-      "courseId": courseId,
-      "userId": localStorage.getItem("userId"),
-      "taskId": taskId
-    }, {
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+    try {
+      const response = await axios.post(`${INSRUMENT_SERVICE}/course/task`, {
+        "courseId": courseId,
+        "userId": localStorage.getItem("userId"),
+        "taskId": taskId
+      }, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        }
+      });
+  
+      if (response.status == 401) {
+        history.push("/auth");
+        return;
       }
-    });
-
-    if (response.status == 401) {
-      history.push("/auth");
-      return;
-    }
-
-    if (response.status == 201) {
       alert("Task Added Successfully");
-    } else {
-      alert("Task Failed To Add");
+      currentCourseTask.push(response.data);
+    } catch (error) {
+      alert(error.response.data.message);
     }
   };
 
@@ -103,7 +101,7 @@ export default function DevelopmentTable(props) {
           lineHeight='100%'>
           Course <Text display='inline-block' color="green">{currentCourseName ? currentCourseName : ""} </Text> Task Table
         </Text>
-        <Menu>
+        {currentCourseId != 0 && <Menu>
           <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
             Add Tasks to your course
           </MenuButton>
@@ -112,7 +110,7 @@ export default function DevelopmentTable(props) {
                 <MenuItem onClick={() => addTaskToCourse(currentCourseId, task.id)} key={task.id}>{task.name}</MenuItem>
               ))}
           </MenuList>
-        </Menu>
+        </Menu>}
       </Flex>
       <Table {...getTableProps()} variant='simple' color='gray.500' mb='24px'>
         <Thead>
@@ -152,7 +150,7 @@ export default function DevelopmentTable(props) {
                   } else if (cell.column.Header === "DUE DATE") {
                     data = (
                       <Text color={textColor} fontSize='sm' fontWeight='700'>
-                        {cell.value}
+                        {new Date(cell.value).toDateString()}
                       </Text>
                     );
                   } else if (cell.column.Header === "STATUS") {

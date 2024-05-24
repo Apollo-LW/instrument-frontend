@@ -7,6 +7,7 @@ import {
   Th,
   Thead,
   Tr,
+  Icon,
   Input,
   useDisclosure,
   useColorModeValue,
@@ -24,6 +25,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useMemo, useState } from "react";
 import axios from "axios";
+import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
 import {
   useGlobalFilter,
   usePagination,
@@ -34,7 +36,7 @@ import {
 // Custom components
 import Card from "components/card/Card";
 export default function ColumnsTable(props) {
-  const { columnsData, tableData, ColumnsTable, currentCourseId, currentCourseName } = props;
+  const { columnsData, tableData, ColumnsTable, currentCourseId, currentCourseName, users } = props;
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
@@ -48,7 +50,7 @@ export default function ColumnsTable(props) {
 
   const INSRUMENT_SERVICE = "http://localhost:3000";
 
-  const createTask = async (e) => {
+  const addUser = async (e) => {
     console.log(username);
     if (username === '' || username === ' ') {
       setError("A valid username is required");
@@ -70,6 +72,7 @@ export default function ColumnsTable(props) {
         }
       });
       console.log(response.data);
+      tableData.push(response.data);
       onClose();
       setError("");
     } catch (error) {
@@ -144,7 +147,7 @@ export default function ColumnsTable(props) {
               <Tr {...row.getRowProps()} key={index}>
                 {row.cells.map((cell, index) => {
                   let data = "";
-                  if (cell.column.Header === "NAME") {
+                  if (cell.column.Header === "USERNAME") {
                     data = (
                       <Flex align='center'>
                         <Text color={textColor} fontSize='sm' fontWeight='700'>
@@ -152,28 +155,25 @@ export default function ColumnsTable(props) {
                         </Text>
                       </Flex>
                     );
-                  } else if (cell.column.Header === "PROGRESS") {
+                  } else if (cell.column.Header === "ROLE") {
                     data = (
                       <Flex align='center'>
-                        <Text
-                          me='10px'
-                          color={textColor}
-                          fontSize='sm'
-                          fontWeight='700'>
-                          {cell.value}%
+                        <Icon
+                          w='24px'
+                          h='24px'
+                          me='5px'
+                          color={cell.value === "admin" || cell.value === "owner" ? "green.500" : "orange.500"}
+                          as={cell.value === "admin" || cell.value === "owner" ? MdCheckCircle : MdCancel}
+                        />
+                        <Text color={textColor} fontSize='sm' fontWeight='700'>
+                          {cell.value}
                         </Text>
                       </Flex>
                     );
-                  } else if (cell.column.Header === "QUANTITY") {
+                  } else if (cell.column.Header === "Last Role Update") {
                     data = (
                       <Text color={textColor} fontSize='sm' fontWeight='700'>
-                        {cell.value}
-                      </Text>
-                    );
-                  } else if (cell.column.Header === "DATE") {
-                    data = (
-                      <Text color={textColor} fontSize='sm' fontWeight='700'>
-                        {cell.value}
+                        {new Date(cell.value).toDateString()}
                       </Text>
                     );
                   }
@@ -193,7 +193,7 @@ export default function ColumnsTable(props) {
           })}
         </Tbody>
       </Table>
-      <Button
+      {currentCourseId != 0 && <Button
         me='100%'
         mb='50px'
         w='190px'
@@ -205,7 +205,7 @@ export default function ColumnsTable(props) {
         onClick={onOpen}
         fontWeight='500'>
         Add/Update User
-      </Button>
+      </Button>}
       <Modal
         initialFocusRef={initialRef}
         finalFocusRef={finalRef}
@@ -232,7 +232,7 @@ export default function ColumnsTable(props) {
 
           <ModalFooter>
             <Button onClick={onClose} mr={3} background="red">Discard</Button>
-            <Button colorScheme='blue' mr={3} onClick={createTask}>Add</Button>
+            <Button colorScheme='blue' mr={3} onClick={addUser}>Add</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

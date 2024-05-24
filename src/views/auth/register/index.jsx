@@ -46,7 +46,7 @@ function Register() {
   const ONLY_LETTERS = /^[a-zA-Z]+$/;
   const USERNAME_REGEX = /^[a-zA-Z0-9_\.]+$/;
   const EMAIL_REGEX = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
-  const PASSWORD_REGEX = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
+  const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -75,7 +75,7 @@ function Register() {
       return;
     }
     if (password === '' || password === ' ' || !PASSWORD_REGEX.test(password)) {
-      setError("A password is required and must contain at least one special character and at least one number");
+      setError("A password must be a minimum of eight characters, and at least one letter, one number and one special character");
       return;
     }
 
