@@ -7,6 +7,7 @@ import {
   Td,
   Text,
   Th,
+  Icon,
   Thead,
   Tr,
   useColorModeValue,
@@ -20,6 +21,7 @@ import {
 import Card from "components/card/Card";
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import React, { useEffect, useState, useMemo } from "react";
+import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
 import axios from "axios";
 import {
   useGlobalFilter,
@@ -30,11 +32,13 @@ import {
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function DevelopmentTable(props) {
-  const { columnsData, tableData, userTasksToAdd, currentCourseId, currentCouseName } = props;
+  const { columnsData, userTasksToAdd, currentCourseId, currentCouseName, currentCourseTask } = props;
   const INSRUMENT_SERVICE = "http://localhost:3000";
 
   const columns = useMemo(() => columnsData, [columnsData]);
-  const data = useMemo(() => tableData, [tableData]);
+  const data = useMemo(() => currentCourseTask, [currentCourseTask]);
+
+  console.log(currentCourseTask)
 
   const tableInstance = useTable(
     {
@@ -125,24 +129,48 @@ export default function DevelopmentTable(props) {
                         {cell.value}
                       </Text>
                     );
-                  } else if (cell.column.Header === "DESCRIPTION") {
+                  } else if (cell.column.Header === "STATUS") {
                     data = (
                       <Flex align='center'>
-                        <Text
-                          me='10px'
-                          color={textColor}
-                          fontSize='sm'
-                          fontWeight='700'>
-                          {cell.value}%
-                        </Text>
-                        <Progress
-                          variant='table'
-                          colorScheme='brandScheme'
-                          h='8px'
-                          w='63px'
-                          value={cell.value}
+                        <Icon
+                          w='24px'
+                          h='24px'
+                          me='5px'
+                          color={
+                            cell.value === "Finished"
+                              ? "green.500"
+                              : cell.value === "Almost Done"
+                              ? "orange.500"
+                              : cell.value === "Not Started"
+                              ? "red.500"
+                              : null
+                          }
+                          as={
+                            cell.value === "Finished"
+                              ? MdCheckCircle
+                              : cell.value === "Almost Done"
+                              ? MdCancel
+                              : cell.value === "Not Started"
+                              ? MdOutlineError
+                              : null
+                          }
                         />
+                        <Text color={textColor} fontSize='sm' fontWeight='700'>
+                          {cell.value}
+                        </Text>
                       </Flex>
+                    );
+                  } else if (cell.column.Header === "DUE DATE") {
+                    data = (
+                      <Text color={textColor} fontSize='sm' fontWeight='700'>
+                        {new Date(cell.value).toDateString()}
+                      </Text>
+                    );
+                  } else if (cell.column.Header === "DESCRIPTION") {
+                    data = (
+                      <Text color={textColor} fontSize='sm' fontWeight='700' noOfLines={[1, 2, 3]}>
+                        {cell.value}
+                      </Text>
                     );
                   }
                   return (

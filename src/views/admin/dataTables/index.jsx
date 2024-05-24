@@ -139,11 +139,11 @@ export default function Settings() {
           currentCouseName={selectedCourseName}
           currentCourseId={selectedCourseId}
           columnsData={columnsDataDevelopment}
-          tableData={tableDataDevelopment}
           userTasksToAdd={tasks.map(task => ({
               name: task.name,
               id: task._id
             }))}
+            currentCourseTask={selectedCourseTasks}
         />
         <ColumnsTable
           currentCourseId={selectedCourseId}
