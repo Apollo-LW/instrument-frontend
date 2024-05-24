@@ -166,7 +166,7 @@ export default function Settings() {
             <Text color={textColorPrimary} fontSize='2xl' fontWeight='400'>
               Course Name
             </Text>
-            <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
+            <Text color='green' fontSize='2xl' fontWeight='700'>
               {selectedCourseName}
             </Text>
             <Text color={textColorSecondary} fontSize='sm' fontWeight='400'>
@@ -218,7 +218,9 @@ export default function Settings() {
           columnsData={columnsDataColumns}
           tableData={users}
         />
-        <ComplexTable // Course Task list
+        <ComplexTable
+          currentCourseId={selectedCourseId}
+          currentCourseName={selectedCourseName}
           columnsData={columnsDataComplex}
           tableData={tableDataComplex}
         />

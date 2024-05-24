@@ -27,16 +27,15 @@ export const columnsDataCheck = [
     accessor: "status",
   },
   {
-    Header: "ROLE",
-    accessor: "userRole",
-  },
-  {
     Header: "DUE DATE",
     accessor: "dueDate",
   }, 
   {
     Header: "DESCRIPTION",
     accessor: "desciption",
+  }, {
+    Header: "EDIT",
+    accessor: "edit"
   }
 ];
 

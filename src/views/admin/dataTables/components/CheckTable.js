@@ -34,6 +34,7 @@ import {
 
 // Custom components
 import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
+import { EditIcon } from '@chakra-ui/icons'
 import Card from "components/card/Card";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import axios from "axios";
@@ -50,6 +51,7 @@ export default function CheckTable(props) {
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
   const [taskName, setTaskName] = useState("");
+  const [taskId, setTaskId] = useState(0);
   const [dueDate, setDueDate] = useState("");
   const [status, setStatus] = useState("");
   const [desciption, setDesciption] = useState("");
@@ -59,27 +61,43 @@ export default function CheckTable(props) {
   const INSRUMENT_SERVICE = "http://localhost:3000";
 
   const createTask = async (e) => {
-    console.log(taskName);
     if (taskName === '' || taskName === ' ') {
       setError("A valid name is required");
       return;
     }
 
     try {
-      const response = await axios.post(`${INSRUMENT_SERVICE}/task`, {
-        "name": taskName,
-        "desciption": desciption,
-        "dueDate": dueDate,
-        "creatorID": localStorage.getItem("userId"),
-        "status": status,
-        "isExam": taskIsExam
-      }, {
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        }
-      });
+      if (taskId == 0) {
+        const response = await axios.post(`${INSRUMENT_SERVICE}/task`, {
+          "name": taskName,
+          "desciption": desciption,
+          "dueDate": dueDate,
+          "creatorID": localStorage.getItem("userId"),
+          "status": status,
+          "isExam": taskIsExam
+        }, {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          }
+        });
+      } else {
+        const response = await axios.patch(`${INSRUMENT_SERVICE}/task/${taskId}`, {
+          "name": taskName,
+          "desciption": desciption,
+          "dueDate": dueDate,
+          "creatorID": localStorage.getItem("userId"),
+          "status": status,
+          "isExam": taskIsExam
+        }, {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          }
+        });
+      }
+
       onClose();
       setError("");
+      setTaskId(0);
     } catch (error) {
       setError(error.response.data.message);
     }
@@ -119,7 +137,7 @@ export default function CheckTable(props) {
           fontSize='22px'
           fontWeight='700'
           lineHeight='100%'>
-          All of Your Task
+          All of Your Created Tasks
         </Text>
       </Flex>
       <Table {...getTableProps()} variant='simple' color='gray.500' mb='24px'>
@@ -190,12 +208,6 @@ export default function CheckTable(props) {
                         </Text>
                       </Flex>
                     );
-                  } else if (cell.column.Header === "ROLE") {
-                    data = (
-                      <Text color={textColor} fontSize='sm' fontWeight='700'>
-                        {cell.value}
-                      </Text>
-                    );
                   } else if (cell.column.Header === "DUE DATE") {
                     data = (
                       <Text color={textColor} fontSize='sm' fontWeight='700'>
@@ -208,6 +220,19 @@ export default function CheckTable(props) {
                         {cell.value}
                       </Text>
                     );
+                  } else if (cell.column.Header === "EDIT") {
+                    data = (
+                      <EditIcon boxSize={6} onClick={() => {
+                        const org = row.original;
+                        setTaskId(org._id);
+                        setTaskName(org.name);
+                        setDesciption(org.desciption);
+                        setDueDate(org.dueDate);
+                        setStatus(org.status);
+                        setTaskIsExam(org.isExam);
+                        onOpen();
+                      }} />
+                    )
                   }
                   return (
                     <Td
@@ -251,21 +276,21 @@ export default function CheckTable(props) {
           <ModalBody pb={6}>
             <FormControl>
               <FormLabel>Task name</FormLabel>
-              <Input ref={initialRef} placeholder='Physics Homework' color={textColorPrimary} onChange={e => setTaskName(e.target.value)}/>
+              <Input ref={initialRef} placeholder='Physics Homework' value={taskName} color={textColorPrimary} onChange={e => setTaskName(e.target.value)}/>
             </FormControl>
 
             <FormControl mt={4}>
               <FormLabel>Task Desciption</FormLabel>
-              <Input placeholder='Task Desciption' color={textColorPrimary} onChange={e => setDesciption(e.target.value)}/>
+              <Input placeholder='Task Desciption' color={textColorPrimary} value={desciption} onChange={e => setDesciption(e.target.value)}/>
             </FormControl>
 
             <FormControl mt={4}>
               <FormLabel>Due Date</FormLabel>
-              <Input type='datetime-local' color={textColorPrimary} onChange={e => setDueDate(e.target.value)} />
+              <Input type='datetime-local' color={textColorPrimary} value={dueDate} onChange={e => setDueDate(e.target.value)} />
             </FormControl>
 
             <FormControl mt={4}>
-              <Select placeholder='Task Status' color={textColorPrimary} onChange={e => setStatus(e.target.options[e.target.selectedIndex].value)}>
+              <Select placeholder='Task Status' color={textColorPrimary} value={status} onChange={e => setStatus(e.target.options[e.target.selectedIndex].value)}>
                 <option color={textColorPrimary} value='Finished'>Finished</option>
                 <option value='Almost Done'>Almost Done</option>
                 <option value='Not Started'>Not Started</option>
@@ -279,7 +304,7 @@ export default function CheckTable(props) {
 
           <ModalFooter>
             <Button onClick={onClose} mr={3} background="red">Discard</Button>
-            <Button colorScheme='blue' mr={3} onClick={createTask}>Create</Button>
+            <Button colorScheme='blue' mr={3} onClick={createTask}>{taskId != 0 ? 'Update' : 'Create'}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
