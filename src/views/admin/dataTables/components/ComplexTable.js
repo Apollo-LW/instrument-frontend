@@ -22,7 +22,11 @@ import {
   FormLabel,
   ModalFooter,
   Input,
-  Select
+  Select,
+  Menu, 
+  MenuButton, 
+  MenuItem, 
+  MenuList,
 } from "@chakra-ui/react";
 import React, { useMemo, useState } from "react";
 import {
@@ -34,21 +38,20 @@ import {
 
 // Custom components
 import Card from "components/card/Card";
-import Menu from "components/menu/MainMenu";
 
 // Assets
-import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { ChevronDownIcon } from '@chakra-ui/icons'
 import axios from "axios";
 
 export default function ColumnsTable(props) {
-  const { columnsData, tableData, currentCourseId, currentCourseName } = props;
+  const { columnsData, tableData, currentCourseId, currentCourseName, userAssetsToAdd } = props;
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
   const cardShadow = useColorModeValue(
     "0px 18px 40px rgba(112, 144, 176, 0.12)",
     "unset"
   );
+  const INSRUMENT_SERVICE = "http://localhost:3000";
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
@@ -73,6 +76,40 @@ export default function ColumnsTable(props) {
   } = tableInstance;
   initialState.pageSize = 5;
 
+  const addAsset = async (courseId, fileId) => {
+    try {
+      const response = await axios.post(`${INSRUMENT_SERVICE}/course/asset`, {
+        "courseId": courseId,
+        "userId": localStorage.getItem('userId'),
+        "assetId": fileId
+      }, {
+        headers: {
+          "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+        }
+      });
+
+      if (response.data) {
+        alert("Asset Added Successfully");
+      }
+    } catch (err) {
+      console.log(err);
+      alert("Failed to add Asset");
+    }
+  };
+
+  const fetchUser = async (userId) => {
+    try {
+      const response = await axios.get(`${INSRUMENT_SERVICE}/user/${userId}`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        }
+      });
+      return response.data.username;
+    } catch (err) {
+      console.log(err);
+    } 
+  };
+
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
   return (
@@ -87,9 +124,19 @@ export default function ColumnsTable(props) {
           fontSize='22px'
           fontWeight='700'
           lineHeight='100%'>
-          Course <Text display='inline-block' color="green">{currentCourseName ? currentCourseName : ""} </Text> Users Table
+          Course <Text display='inline-block' color="green">{currentCourseName ? currentCourseName : ""} </Text> Assets Table
         </Text>
-        <Menu />
+        {currentCourseId != 0 && <Menu>
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+            Add Assets to your course
+          </MenuButton>
+          <MenuList>
+            {
+            userAssetsToAdd.map((file) => (
+                <MenuItem onClick={() => addAsset(currentCourseId, file._id)} key={file._id}>{file.name}</MenuItem>
+              ))}
+          </MenuList>
+        </Menu>}
       </Flex>
       <Table {...getTableProps()} variant='simple' color='gray.500' mb='24px'>
         <Thead>
@@ -126,53 +173,31 @@ export default function ColumnsTable(props) {
                         {cell.value}
                       </Text>
                     );
-                  } else if (cell.column.Header === "STATUS") {
+                  } else if (cell.column.Header === "SIZE") {
                     data = (
                       <Flex align='center'>
-                        <Icon
-                          w='24px'
-                          h='24px'
-                          me='5px'
-                          color={
-                            cell.value === "Approved"
-                              ? "green.500"
-                              : cell.value === "Disable"
-                              ? "red.500"
-                              : cell.value === "Error"
-                              ? "orange.500"
-                              : null
-                          }
-                          as={
-                            cell.value === "Approved"
-                              ? MdCheckCircle
-                              : cell.value === "Disable"
-                              ? MdCancel
-                              : cell.value === "Error"
-                              ? MdOutlineError
-                              : null
-                          }
-                        />
                         <Text color={textColor} fontSize='sm' fontWeight='700'>
-                          {cell.value}
+                          {(cell.value)/1000} kB
                         </Text>
                       </Flex>
                     );
-                  } else if (cell.column.Header === "DATE") {
+                  } else if (cell.column.Header === "CREATED AT") {
                     data = (
                       <Text color={textColor} fontSize='sm' fontWeight='700'>
-                        {cell.value}
+                        {new Date(cell.value).toLocaleDateString(undefined, {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
                       </Text>
                     );
-                  } else if (cell.column.Header === "PROGRESS") {
+                  } else if (cell.column.Header === "CREATOR") {
                     data = (
                       <Flex align='center'>
-                        <Progress
-                          variant='table'
-                          colorScheme='brandScheme'
-                          h='8px'
-                          w='108px'
-                          value={cell.value}
-                        />
+                        <Text color={textColor} fontSize='sm' fontWeight='700'>
+                          {cell.value}
+                        </Text>
                       </Flex>
                     );
                   }

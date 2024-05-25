@@ -60,15 +60,15 @@ export const columnsDataComplex = [
     accessor: "name",
   },
   {
-    Header: "STATUS",
-    accessor: "status",
+    Header: "SIZE",
+    accessor: "size",
   },
   {
-    Header: "DATE",
-    accessor: "date",
+    Header: "CREATED AT",
+    accessor: "createdAt",
   },
   {
-    Header: "PROGRESS",
-    accessor: "progress",
+    Header: "CREATOR",
+    accessor: "creatorId",
   },
 ];

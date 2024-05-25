@@ -65,6 +65,7 @@ export default function Upload(props) {
           assetId: response.id,
           isPublic: isAssetPublic,
           size: response.size,
+          createdAt: response.uploadDate,
           fileLastModified: file.lastModifiedDate,
         }, {
           headers: {

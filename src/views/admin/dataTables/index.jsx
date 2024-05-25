@@ -11,10 +11,6 @@ import {
   columnsDataColumns,
   columnsDataComplex,
 } from "views/admin/dataTables/variables/columnsData";
-import tableDataDevelopment from "views/admin/dataTables/variables/tableDataDevelopment.json";
-import tableDataCheck from "views/admin/dataTables/variables/tableDataCheck.json";
-import tableDataColumns from "views/admin/dataTables/variables/tableDataColumns.json";
-import tableDataComplex from "views/admin/dataTables/variables/tableDataComplex.json";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
@@ -30,6 +26,7 @@ export default function Settings() {
   const [tasks, setTasks] = useState([]);
   const [selectedCourseTasks, setSelectedCourseTasks] = useState([]);
   const [users, setUsers] = useState([]);
+  const [files, setFiles] = useState([]);
 
   const [selectedCourseId, setSelectedCourseId] = useState(0);
   const [selectedCourseName, setSelectedCourseName] = useState("");
@@ -38,6 +35,7 @@ export default function Settings() {
   const [selectedCourseStartTime, setSelectedCourseStartTime] = useState("");
   const [selectedCourseEndTime, setSelectedCourseEndTime] = useState("");
   const [selectedCourseRepeated, setSelectedCourseRepeated] = useState([]);
+  const [selectedCourseFiles, setSelectedCourseFiles] = useState([]);
 
   const fetchSelectedCourse = async (courseId) => {
     if (courseId == 0) {
@@ -89,7 +87,7 @@ export default function Settings() {
       return;
     }
 
-    const response = await axios.get(`${INSRUMENT_SERVICE}/course/task/list/${selectedCourseId}`, {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/course/list/task/${selectedCourseId}`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`,
       }
@@ -123,6 +121,10 @@ export default function Settings() {
   };
 
   const fetchCourseUsernames = async () => {
+    if (selectedCourseId == 0) {
+      return;
+    }
+
     const response = await axios.get(`${INSRUMENT_SERVICE}/course/list/users/${selectedCourseId}`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -139,11 +141,42 @@ export default function Settings() {
     }
   };
 
+  const fetchUserFiles = async () => {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/asset/list/${localStorage.getItem("userId")}`, {
+      headers: {
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.data) {
+      setFiles(response.data);
+    }
+  };
+
+  const fetchCourseFiles = async () => {
+    if (selectedCourseId == 0) {
+      return;
+    }
+
+    const response = await axios.get(`${INSRUMENT_SERVICE}/course/list/asset/${selectedCourseId}`, {
+      headers: {
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.data) {
+      setSelectedCourseFiles(response.data);
+    }
+  }
+
+
   useEffect(() => {
     fetchUserCourses();
     fetchUserTasks();
     fetchCourseTasks();
     fetchCourseUsernames();
+    fetchUserFiles();
+    fetchCourseFiles();
   }, [selectedCourseId]);
 
   // Chakra Color Mode
@@ -222,7 +255,8 @@ export default function Settings() {
           currentCourseId={selectedCourseId}
           currentCourseName={selectedCourseName}
           columnsData={columnsDataComplex}
-          tableData={tableDataComplex}
+          tableData={selectedCourseFiles}
+          userAssetsToAdd={files}
         />
       </SimpleGrid>
     </Box>
