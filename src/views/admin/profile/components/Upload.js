@@ -67,7 +67,8 @@ export default function Upload(props) {
           creatorId: localStorage.getItem("userId"),
           assetId: response.id,
           isPublic: isAssetPublic,
-          size: response.size
+          size: response.size,
+          createdAt: response.uploadDate
         }, {
           headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
