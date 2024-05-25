@@ -22,6 +22,8 @@ export default function Banner(props) {
   const brandColor = useColorModeValue("brand.500", "white");
   const textColorSecondary = "gray.400";
   const box = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+  const usedPercentage = ((used/total)*100).toFixed(2);
+
   return (
     <Card mb={{ base: "0px", lg: "20px" }} align='center'>
       <IconBox
@@ -37,7 +39,7 @@ export default function Banner(props) {
         Your storage
       </Text>
       <Text color={textColorPrimary} fontWeight='bold' fontSize='xl' mt='10px'>
-        {`You Used ${((used/total)*100).toFixed(2)}% of your storage so far`}
+        You used <Text display='inline-block' fontWeight='bold' fontSize='xl' color={usedPercentage >= 0.75 ? 'red' : 'green'}>{usedPercentage}%</Text> of your storage so far
       </Text>
       <Text
         color={textColorSecondary}
