@@ -54,13 +54,20 @@ export default function Upload(props) {
       formData.append("file", file);
     });
     try {
-      const responses = await axios.post(`${ASSET_MANAGMENT}/api/files`, formData);
+      const responses = await axios.post(`${ASSET_MANAGMENT}/api/files`,
+        formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        }
+      });
       Promise.all(responses.data.map(async (response) => {
+        console.log(response);
         const userAdd = await axios.post(`${INSRUMENT_SERVICE}/asset`, {
           name: response.filename,
           creatorId: localStorage.getItem("userId"),
           assetId: response.id,
-          isPublic: isAssetPublic
+          isPublic: isAssetPublic,
+          size: response.size
         }, {
           headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,

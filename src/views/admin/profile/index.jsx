@@ -1,5 +1,5 @@
 // Chakra imports
-import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, Grid, useDisclosure } from "@chakra-ui/react";
+import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, Grid, Image, SimpleGrid, useDisclosure } from "@chakra-ui/react";
 
 // Custom components
 import Banner from "views/admin/profile/components/Banner";
@@ -7,6 +7,7 @@ import General from "views/admin/profile/components/General";
 import Projects from "views/admin/profile/components/Projects";
 import Storage from "views/admin/profile/components/Storage";
 import Upload from "views/admin/profile/components/Upload";
+import ComplexTable from "views/admin/dataTables/components/ComplexTable";
 
 // Assets
 import banner from "assets/img/auth/banner.png";
@@ -14,6 +15,13 @@ import avatar from "assets/img/avatars/avatar4.png";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import {
+  columnsDataDevelopment,
+  columnsDataCheck,
+  columnsDataColumns,
+  columnsDataComplex,
+} from "views/admin/dataTables/variables/columnsData";
+import tableDataComplex from "views/admin/dataTables/variables/tableDataComplex.json";
 
 export default function Overview() {
   const INSRUMENT_SERVICE = "http://localhost:3000";
@@ -21,6 +29,8 @@ export default function Overview() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const cancelRef = React.useRef()
   const history = useHistory();
+  const [images, setImages] = useState([]);
+  const [storageUsage, setStorageUsage] = useState(0);
 
   const fetchUsername = async () => {
     const response = await axios.get(`${INSRUMENT_SERVICE}/user/${localStorage.getItem("userId")}`, {
@@ -33,6 +43,30 @@ export default function Overview() {
       setUsername(response.data.username);
     }
   };
+
+  const fetchImages = async () => {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/asset/list/${localStorage.getItem("userId")}`, {
+      headers: {
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.data) {
+      setImages(response.data);
+    }
+  };
+
+  const fetchStorageUsage = async () => {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/asset/size/${localStorage.getItem("userId")}`, {
+      headers: {
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.data) {
+      setStorageUsage(response.data);
+    }
+  }
 
   const deleteAccount = async () => {
     const response = await axios.delete(`${INSRUMENT_SERVICE}/user/${localStorage.getItem("userId")}`, {
@@ -47,10 +81,12 @@ export default function Overview() {
         history.push('/auth');
       }
     }
-  }
+  };
 
   useEffect(() => {
     fetchUsername();
+    fetchImages();
+    fetchStorageUsage();
   }, []);
 
   return (
@@ -72,9 +108,30 @@ export default function Overview() {
           avatar={avatar}
           name={username}
         />
-        <Upload
+        <SimpleGrid
           gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 5 / 5 / 2" }}
-        />
+          minChildWidth="150px"
+          spacing="40px"zes
+          maxW="xl"
+          alignItems="center"
+          justifyContent="center"
+          margin="100px auto">
+          <Box>
+            {/* <Image src="https://bit.ly/dan-abramov" alt="Dan Abramov" /> */}
+          </Box>
+        </SimpleGrid>
+      </Grid>
+      <Grid
+        templateColumns={{
+          base: "1fr",
+          lg: "1.34fr 1fr 1.62fr",
+        }}
+        templateRows={{
+          base: "repeat(3, 1fr)",
+          lg: "1fr",
+        }}
+        gap={{ base: "20px", xl: "20px" }}>
+        <Upload gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 5 / 5 / 1" }}/>
       </Grid>
       <Grid
         mb='20px'
@@ -101,7 +158,7 @@ export default function Overview() {
         />
         <Storage
           gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
-          used={25.6}
+          used={storageUsage}
           total={50}
         />
       </Grid>

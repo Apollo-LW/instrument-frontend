@@ -36,6 +36,9 @@ export default function Banner(props) {
       <Text color={textColorPrimary} fontWeight='bold' fontSize='2xl' mt='10px'>
         Your storage
       </Text>
+      <Text color={textColorPrimary} fontWeight='bold' fontSize='xl' mt='10px'>
+        {`You Used ${((used/total)*100).toFixed(2)}% of your storage so far`}
+      </Text>
       <Text
         color={textColorSecondary}
         fontSize='md'
