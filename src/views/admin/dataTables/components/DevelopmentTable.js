@@ -7,27 +7,62 @@ import {
   Td,
   Text,
   Th,
+  Icon,
   Thead,
   Tr,
   useColorModeValue,
+  Button,
+  Menu, 
+  MenuButton, 
+  MenuItem, 
+  MenuList,
 } from "@chakra-ui/react";
+
+import { useToast } from "@chakra-ui/react";
+
 // Custom components
 import Card from "components/card/Card";
-import { AndroidLogo, AppleLogo, WindowsLogo } from "components/icons/Icons";
-import Menu from "components/menu/MainMenu";
-import React, { useMemo } from "react";
+import { ChevronDownIcon } from '@chakra-ui/icons'
+import React, { useEffect, useState, useMemo } from "react";
+import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
+import axios from "axios";
 import {
   useGlobalFilter,
   usePagination,
   useSortBy,
   useTable,
 } from "react-table";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function DevelopmentTable(props) {
-  const { columnsData, tableData } = props;
+  const { columnsData, userTasksToAdd, currentCourseId, currentCourseName, currentCourseTask } = props;
+  const INSRUMENT_SERVICE = "http://localhost:3000";
 
   const columns = useMemo(() => columnsData, [columnsData]);
-  const data = useMemo(() => tableData, [tableData]);
+  const data = useMemo(() => currentCourseTask, [currentCourseTask]);
+
+  const addTaskToCourse = async (courseId, taskId) => {
+    try {
+      const response = await axios.post(`${INSRUMENT_SERVICE}/course/task`, {
+        "courseId": courseId,
+        "userId": localStorage.getItem("userId"),
+        "taskId": taskId
+      }, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        }
+      });
+  
+      if (response.status == 401) {
+        history.push("/auth");
+        return;
+      }
+      alert("Task Added Successfully");
+      currentCourseTask.push(response.data);
+    } catch (error) {
+      alert(error.response.data.message);
+    }
+  };
 
   const tableInstance = useTable(
     {
@@ -64,9 +99,18 @@ export default function DevelopmentTable(props) {
           fontSize='22px'
           fontWeight='700'
           lineHeight='100%'>
-          Tasks Table
+          Course <Text display='inline-block' color="green">{currentCourseName ? currentCourseName : ""} </Text> Task Table
         </Text>
-        <Menu />
+        {currentCourseId != 0 && <Menu>
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+            Add Tasks to your course
+          </MenuButton>
+          <MenuList>
+            {userTasksToAdd.map((task) => (
+                <MenuItem onClick={() => addTaskToCourse(currentCourseId, task.id)} key={task.id}>{task.name}</MenuItem>
+              ))}
+          </MenuList>
+        </Menu>}
       </Flex>
       <Table {...getTableProps()} variant='simple' color='gray.500' mb='24px'>
         <Thead>
@@ -103,67 +147,54 @@ export default function DevelopmentTable(props) {
                         {cell.value}
                       </Text>
                     );
-                  } else if (cell.column.Header === "TECH") {
-                    data = (
-                      <Flex align='center'>
-                        {cell.value.map((item, key) => {
-                          if (item === "apple") {
-                            return (
-                              <AppleLogo
-                                key={key}
-                                color={iconColor}
-                                me='16px'
-                                h='18px'
-                                w='15px'
-                              />
-                            );
-                          } else if (item === "android") {
-                            return (
-                              <AndroidLogo
-                                key={key}
-                                color={iconColor}
-                                me='16px'
-                                h='18px'
-                                w='16px'
-                              />
-                            );
-                          } else if (item === "windows") {
-                            return (
-                              <WindowsLogo
-                                key={key}
-                                color={iconColor}
-                                h='18px'
-                                w='19px'
-                              />
-                            );
-                          }
-                        })}
-                      </Flex>
-                    );
-                  } else if (cell.column.Header === "DATE") {
+                  } else if (cell.column.Header === "DUE DATE") {
                     data = (
                       <Text color={textColor} fontSize='sm' fontWeight='700'>
-                        {cell.value}
+                        {new Date(cell.value).toLocaleString()}
                       </Text>
                     );
-                  } else if (cell.column.Header === "PROGRESS") {
+                  } else if (cell.column.Header === "STATUS") {
                     data = (
                       <Flex align='center'>
-                        <Text
-                          me='10px'
-                          color={textColor}
-                          fontSize='sm'
-                          fontWeight='700'>
-                          {cell.value}%
-                        </Text>
-                        <Progress
-                          variant='table'
-                          colorScheme='brandScheme'
-                          h='8px'
-                          w='63px'
-                          value={cell.value}
+                        <Icon
+                          w='24px'
+                          h='24px'
+                          me='5px'
+                          color={
+                            cell.value === "Finished"
+                              ? "green.500"
+                              : cell.value === "Almost Done"
+                              ? "orange.500"
+                              : cell.value === "Not Started"
+                              ? "red.500"
+                              : null
+                          }
+                          as={
+                            cell.value === "Finished"
+                              ? MdCheckCircle
+                              : cell.value === "Almost Done"
+                              ? MdCancel
+                              : cell.value === "Not Started"
+                              ? MdOutlineError
+                              : null
+                          }
                         />
+                        <Text color={textColor} fontSize='sm' fontWeight='700'>
+                          {cell.value}
+                        </Text>
                       </Flex>
+                    );
+                  } else if (cell.column.Header === "DUE DATE") {
+                    data = (
+                      <Text color={textColor} fontSize='sm' fontWeight='700'>
+                        {new Date(cell.value).toDateString()}
+                      </Text>
+                    );
+                  } else if (cell.column.Header === "DESCRIPTION") {
+                    data = (
+                      <Text color={textColor} fontSize='sm' fontWeight='700' noOfLines={[1, 2, 3]}>
+                        {cell.value}
+                      </Text>
                     );
                   }
                   return (

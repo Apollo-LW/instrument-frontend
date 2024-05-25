@@ -145,6 +145,7 @@ export default function Projects(props) {
               ranking={index + 1}
               title={course.name}
               link='#'
+              type='course'
               boxShadow={cardShadow}
               mb='20px'
               image={pics[index % 3]}/>

@@ -1,5 +1,5 @@
 // Chakra imports
-import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, Grid, useDisclosure } from "@chakra-ui/react";
+import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Text, Box, Button, Grid, Image, SimpleGrid, useDisclosure,  } from "@chakra-ui/react";
 
 // Custom components
 import Banner from "views/admin/profile/components/Banner";
@@ -17,10 +17,15 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function Overview() {
   const INSRUMENT_SERVICE = "http://localhost:3000";
+  const ASSET_MANAGMENT = "http://localhost:3002";
   const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure()
   const cancelRef = React.useRef()
   const history = useHistory();
+  const [storageUsage, setStorageUsage] = useState(0);
 
   const fetchUsername = async () => {
     const response = await axios.get(`${INSRUMENT_SERVICE}/user/${localStorage.getItem("userId")}`, {
@@ -33,6 +38,18 @@ export default function Overview() {
       setUsername(response.data.username);
     }
   };
+
+  const fetchStorageUsage = async () => {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/asset/size/${localStorage.getItem("userId")}`, {
+      headers: {
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.data) {
+      setStorageUsage(response.data);
+    }
+  }
 
   const deleteAccount = async () => {
     const response = await axios.delete(`${INSRUMENT_SERVICE}/user/${localStorage.getItem("userId")}`, {
@@ -47,10 +64,26 @@ export default function Overview() {
         history.push('/auth');
       }
     }
-  }
+  };
+
+  const fetchProfile = async () => {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/user/${localStorage.getItem("userId")}`, {
+      headers: {
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.data) {
+      setFirstName(response.data.firstName);
+      setLastName(response.data.lastName);
+      setEmail(response.data.email);
+    }
+  };
 
   useEffect(() => {
     fetchUsername();
+    fetchStorageUsage();
+    fetchProfile();
   }, []);
 
   return (
@@ -66,15 +99,15 @@ export default function Overview() {
           lg: "1fr",
         }}
         gap={{ base: "20px", xl: "20px" }}>
-        <Banner
+      <Banner
           gridArea='1 / 1 / 2 / 4'
           banner={banner}
           avatar={avatar}
-          name={username}
-        />
-        <Upload
-          gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 5 / 5 / 2" }}
-        />
+          username={username}
+          firstName={firstName}
+          lastName={lastName}
+          email={email}/>
+        <Upload gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 5 / 5 / 2" }}/>
       </Grid>
       <Grid
         mb='20px'
@@ -97,11 +130,10 @@ export default function Overview() {
         <General
           gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
           minH='365px'
-          pe='20px'
-        />
+          pe='20px'/>
         <Storage
           gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
-          used={25.6}
+          used={storageUsage}
           total={50}
         />
       </Grid>

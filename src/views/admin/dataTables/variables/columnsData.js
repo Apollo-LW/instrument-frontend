@@ -4,17 +4,17 @@ export const columnsDataDevelopment = [
     accessor: "name",
   },
   {
-    Header: "TECH",
-    accessor: "tech",
+    Header: "STATUS",
+    accessor: "status",
   },
   {
-    Header: "DATE",
-    accessor: "date",
-  },
+    Header: "DUE DATE",
+    accessor: "dueDate",
+  }, 
   {
-    Header: "PROGRESS",
-    accessor: "progress",
-  },
+    Header: "DESCRIPTION",
+    accessor: "desciption",
+  }
 ];
 
 export const columnsDataCheck = [
@@ -23,35 +23,34 @@ export const columnsDataCheck = [
     accessor: "name",
   },
   {
-    Header: "PROGRESS",
-    accessor: "progress",
+    Header: "STATUS",
+    accessor: "status",
   },
   {
-    Header: "QUANTITY",
-    accessor: "quantity",
-  },
+    Header: "DUE DATE",
+    accessor: "dueDate",
+  }, 
   {
-    Header: "DATE",
-    accessor: "date",
-  },
+    Header: "DESCRIPTION",
+    accessor: "desciption",
+  }, {
+    Header: "EDIT",
+    accessor: "edit"
+  }
 ];
 
 export const columnsDataColumns = [
   {
-    Header: "NAME",
-    accessor: "name",
+    Header: "USERNAME",
+    accessor: "username",
   },
   {
-    Header: "PROGRESS",
-    accessor: "progress",
+    Header: "ROLE",
+    accessor: "role",
   },
   {
-    Header: "QUANTITY",
-    accessor: "quantity",
-  },
-  {
-    Header: "DATE",
-    accessor: "date",
+    Header: "Last Role Update",
+    accessor: "lastUpdated",
   },
 ];
 
