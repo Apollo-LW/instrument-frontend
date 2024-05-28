@@ -37,6 +37,8 @@ export default function Projects(props) {
   const [courseDescription, setCourseDescription] = useState("");
   const [courseStartTimeDate, setCourseStartTimeDate] = useState("");
   const [courseEndTimeDate, setCourseEndTimeDate] = useState("");
+  const [courseStartDate, setCourseStartDate] = useState("");
+  const [courseEndDate, setCourseEndDate] = useState("");
   const [courseIsPublic, setCourseIsPublic] = useState(false);
   const [error, setError] = useState("");
   const { value, getCheckboxProps } = useCheckboxGroup({defaultValue: [],});
@@ -74,7 +76,7 @@ export default function Projects(props) {
         <Text color='gray.700' {...getLabelProps()}>{props.value}</Text>
       </chakra.label>
     )
-  }
+  };
 
   const fetchUserCourses = async () => {
     const response = await axios.get(`${INSRUMENT_SERVICE}/course/user/list/${localStorage.getItem("userId")}`, {
@@ -98,11 +100,13 @@ export default function Projects(props) {
       setError("A valid name is required");
       return;
     }
-    
+
     try {
-      await axios.post(`${INSRUMENT_SERVICE}/course`, {
+      const resposne = await axios.post(`${INSRUMENT_SERVICE}/course`, {
         "name": courseName,
         "courseDescription": courseDescription,
+        "startDate": courseStartDate,
+        "endDate": courseEndDate,
         "startTime": courseStartTimeDate,
         "endTime": courseEndTimeDate,
         "isPublic": courseIsPublic,
@@ -114,10 +118,12 @@ export default function Projects(props) {
           "Authorization": `Bearer ${localStorage.getItem("token")}`,
         }
       });
+      console.log(resposne.data);
+      onClose();
     } catch (error) {
-      setError(error.response.data.message);
+      // setError(error.response);
+      console.log(error);
     }
-    onClose();
   };
 
   useEffect(() => {
@@ -186,13 +192,23 @@ export default function Projects(props) {
             </FormControl>
 
             <FormControl mt={4}>
+              <FormLabel>Course Start Date</FormLabel>
+              <Input type='date' placeholder='' color={textColorPrimary} onChange={e => setCourseStartDate(e.target.value)} />
+            </FormControl>
+
+            <FormControl mt={4}>
               <FormLabel>Course Start Time</FormLabel>
-              <Input type='datetime-local' placeholder='S, T, T 10:00-11:00 A.M' color={textColorPrimary} onChange={e => setCourseStartTimeDate(e.target.value)} />
+              <Input type='time' placeholder='S, T, T 10:00-11:00 A.M' color={textColorPrimary} onChange={e => setCourseStartTimeDate(e.target.value)} />
+            </FormControl>
+
+            <FormControl mt={4}>
+              <FormLabel>Course End Date</FormLabel>
+              <Input type='date' placeholder='' color={textColorPrimary} onChange={e => setCourseEndDate(e.target.value)} />
             </FormControl>
 
             <FormControl mt={4}>
               <FormLabel>Course End Time</FormLabel>
-              <Input type='datetime-local' placeholder='S, T, T 10:00-11:00 A.M' color={textColorPrimary} onChange={e => setCourseEndTimeDate(e.target.value)} />
+              <Input type='time' placeholder='S, T, T 10:00-11:00 A.M' color={textColorPrimary} onChange={e => setCourseEndTimeDate(e.target.value)} />
             </FormControl>
 
             <FormControl mt={4}>
