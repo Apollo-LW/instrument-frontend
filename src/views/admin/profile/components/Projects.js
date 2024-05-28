@@ -14,6 +14,8 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ValidationUtil from "utils";
 import Project from "views/admin/profile/components/Project";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Projects(props) {
   // Chakra Color Mode
@@ -42,7 +44,6 @@ export default function Projects(props) {
   const [courseIsPublic, setCourseIsPublic] = useState(false);
   const [error, setError] = useState("");
   const { value, getCheckboxProps } = useCheckboxGroup({defaultValue: [],});
-
 
   const CustomCheckbox = (props) => {
     const { state, getCheckboxProps, getInputProps, getLabelProps, htmlProps } = useCheckbox(props)
@@ -95,6 +96,18 @@ export default function Projects(props) {
     }
   };
 
+  const showToastMessage = (msg, flg) => {
+    if (flg) {
+      toast.success(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    } else {
+      toast.error(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  };
+
   const createCourse = async (e) => {
     if (courseName === '' || courseName === ' ') {
       setError("A valid name is required");
@@ -119,9 +132,11 @@ export default function Projects(props) {
         }
       });
       console.log(resposne.data);
+      showToastMessage("Course " + courseName + " created Successfully!!");
       onClose();
     } catch (error) {
       // setError(error.response);
+      showToastMessage("Failed to create Course " + courseName);
       console.log(error);
     }
   };
@@ -132,6 +147,7 @@ export default function Projects(props) {
 
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
+      <ToastContainer />
       <Text
         color={textColorPrimary}
         fontWeight='bold'
