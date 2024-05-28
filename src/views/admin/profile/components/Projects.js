@@ -168,6 +168,7 @@ export default function Projects(props) {
               title={course.name}
               link='#'
               type='course'
+              courseId={course._id}
               boxShadow={cardShadow}
               mb='20px'
               image={pics[index % 3]}/>
