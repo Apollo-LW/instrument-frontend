@@ -1,5 +1,16 @@
 // Chakra imports
-import { SimpleGrid, Text, useColorModeValue} from "@chakra-ui/react";
+import { SimpleGrid, Text, useColorModeValue, Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  Button, 
+  Divider,
+  useDisclosure,
+  ModalCloseButton} from "@chakra-ui/react";
+  import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
 // Custom components
 import Card from "components/card/Card.js";
@@ -18,6 +29,10 @@ export default function GeneralInformation(props) {
     "0px 18px 40px rgba(112, 144, 176, 0.12)",
     "unset"
   );
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const initialRef = React.useRef();
+  const finalRef = React.useRef();
+
 
   const INSRUMENT_SERVICE = "http://localhost:3000";
   const ASSET_MANAGMENT = "http://localhost:3002";
@@ -49,6 +64,30 @@ export default function GeneralInformation(props) {
 
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
+  };
+
+
+  const showToastMessage = (msg, flg) => {
+    if (flg) {
+      toast.success(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    } else {
+      toast.error(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  };
+
+
+  const deleteAsset = async (id) => {
+    console.log(id);
+    const response = await axios.delete(`${ASSET_MANAGMENT}/api/files/${id}`);
+    if (response.data) {
+      console.log(response.data);
+      onClose();
+      showToastMessage("Successfully Deleted the asset", true);
+    }
   }
 
   useEffect(() => {
@@ -57,6 +96,7 @@ export default function GeneralInformation(props) {
 
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
+      <ToastContainer />
       <Text
         color={textColorPrimary}
         fontWeight='bold'
@@ -70,7 +110,7 @@ export default function GeneralInformation(props) {
       </Text>
       {
         files.map((file, index) =>
-          <div key={index}>
+          <span key={index}>
             <Project
               key={index + 1}
               ranking={index + 1}
@@ -79,7 +119,9 @@ export default function GeneralInformation(props) {
               boxShadow={cardShadow}
               onClick={() => downloadAsset(file.assetId, file.name)}
               mb='20px'/>
-          </div>
+              <Button key={index + 1} m='5px' display='inline' onClick={() => deleteAsset(file.assetId)} color='red'>Delete</Button>
+              <Divider m='20px' />
+          </span>
         )
       }
     </Card>

@@ -107,6 +107,10 @@ export default function Project(props) {
 
 
   const updateCourse = async () => {
+    if (type === 'asset') {
+      return;
+    }
+    
     if (selectedCourseName === '' || selectedCourseName === ' ') {
       showToastMessage("course name can't be empty ");
       return;
@@ -179,7 +183,7 @@ export default function Project(props) {
             me='4px'>
             {type.charAt(0).toUpperCase() + type.slice(1)} #{ranking} •{" "}
             <Text fontWeight='500' color={brandColor} onClick={showCourseDetails} fontSize='sm'>
-              See {type} details and Update
+              See {type} details
             </Text>
           </Text>
         </Box>
