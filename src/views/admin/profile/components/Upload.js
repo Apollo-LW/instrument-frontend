@@ -8,7 +8,20 @@ import {
   Text,
   Checkbox,
   useColorModeValue,
+  ModalBody, 
+  ModalCloseButton, 
+  ModalContent, 
+  ModalFooter, 
+  ModalHeader, 
+  ModalOverlay, 
+  Modal,
+  useDisclosure,
+  useCheckbox, 
+  useCheckboxGroup,
 } from "@chakra-ui/react";
+import {
+  chakra
+} from "@chakra-ui/system"
 import axios from "axios";
 // Custom components
 import Card from "components/card/Card.js";
@@ -18,6 +31,8 @@ import { MdUpload } from "react-icons/md";
 
 export default function Upload(props) {
   const { used, total, ...rest } = props;
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { value, getCheckboxProps } = useCheckboxGroup({defaultValue: [],});
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const brandColor = useColorModeValue("brand.500", "white");
@@ -25,8 +40,43 @@ export default function Upload(props) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [isAssetPublic, setIsAssetPublic] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
+  const [assetId, setAssetId] = useState("");
+  const [suggestedCouses, setSuggestedCouses] = useState([]);
   const ASSET_MANAGMENT = "http://localhost:3002";
   const INSRUMENT_SERVICE = "http://localhost:3000";
+
+  const CustomCheckbox = (props) => {
+    const { state, getCheckboxProps, getInputProps, getLabelProps, htmlProps } = useCheckbox(props)
+
+    return (
+      <chakra.label
+        display='flex'
+        flexDirection='row'
+        alignItems='center'
+        gridColumnGap={2}
+        bg='green.50'
+        border='1px solid'
+        borderColor='green.500'
+        rounded='lg'
+        px={3}
+        py={1}
+        cursor='pointer'
+        {...htmlProps}>
+        <input {...getInputProps()} hidden />
+        <Flex
+          alignItems='center'
+          justifyContent='center'
+          border='2px solid'
+          borderColor='green.500'
+          w={4}
+          h={4}
+          {...getCheckboxProps()}>
+          {state.isChecked && <Box w={2} h={2} bg='green.500' />}
+        </Flex>
+        <Text color='gray.700' {...getLabelProps()}>{props.value.split(":")[0]}</Text>
+      </chakra.label>
+    )
+  };
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     acceptedFiles.forEach((file) => {
@@ -43,45 +93,81 @@ export default function Upload(props) {
   } = useDropzone({ onDrop });
   const borderColor = useColorModeValue("secondaryGray.100", "whiteAlpha.100");
 
+  const testDate = async (e) => {
+    const userAdd = await axios.get(`${INSRUMENT_SERVICE}/asset/test`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+    console.log(userAdd);
+  }
+
   const uploadFile = async (e) => {
     if (selectedFiles.length == 0) {
       setUploadStatus("Upload Failed!, please select at least one file");
       return;
     }
     setUploadStatus("Uploading...");
-    try {
-      Promise.all(selectedFiles.map(async (file) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        const response = await axios.post(`${ASSET_MANAGMENT}/api/files`,
-          formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          }
-        });
-        const userAdd = await axios.post(`${INSRUMENT_SERVICE}/asset`, {
-          name: response.filename,
+    selectedFiles.map(async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = axios.post(`${ASSET_MANAGMENT}/api/files`,
+        formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        }
+      }).then(fileResponse => {
+        const data = fileResponse.data[0];
+        const assetAdd = axios.post(`${INSRUMENT_SERVICE}/asset`, {
+          name: file.name,
           creatorId: localStorage.getItem("userId"),
-          assetId: response.id,
+          assetId: data.id,
           isPublic: isAssetPublic,
-          size: response.size,
-          createdAt: response.uploadDate,
+          size: file.size,
+          createdAt: data.uploadDate,
           fileLastModified: file.lastModifiedDate,
         }, {
           headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
           }
+        }).then(assetAddResposne => {
+          setUploadStatus(`Successfully Uploaded ${selectedFiles.length} assets :)`);            
+          setSelectedFiles([]);
+          setIsAssetPublic(false);
+          const suggestedCousesTmp = assetAddResposne.data.courseSuggestion.courses;
+          if (suggestedCousesTmp.length > 0) {
+            setSuggestedCouses(suggestedCousesTmp);
+            setAssetId(assetAddResposne.data.courseSuggestion.assetId);
+          }
+        }).then((tmp) => onOpen());
+      }).catch((err) => {
+        setUploadStatus("Upload Failed!");
+      })
+    });
+  };
+
+  const addAsset = async () => {
+    Promise.all(value.map(async (courseToAdd) => {
+      try {
+        const response = await axios.post(`${INSRUMENT_SERVICE}/course/asset`, {
+          "courseId": courseToAdd.split(":")[1],
+          "userId": localStorage.getItem('userId'),
+          "assetId": assetId
+        }, {
+          headers: {
+            "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+          }
         });
-        console.log(userAdd.data);
-      }));
-      setUploadStatus(`Successfully Uploaded ${selectedFiles.length} assets :)`);
-      setSelectedFiles([]);
-      setIsAssetPublic(false);
-    } catch (e) {
-      console.log(e);
-      setUploadStatus("Upload Failed!");
-    }
-  }
+  
+        if (response.data) {
+          alert("Asset Added Successfully " + courseToAdd);
+        }
+      } catch (err) {
+        console.log(err);
+        alert("Failed to add Asset");
+      };
+    })).then((response) => console.log(response));
+  };
 
   return (
     <Card {...rest} mb='20px' align='center' p='25px'>
@@ -147,6 +233,24 @@ export default function Upload(props) {
             </Button>
           </Flex>
         </Flex>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Suggested Courses to add the asset to</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              {suggestedCouses && suggestedCouses.map((course) => (
+                <div key={course._id}>
+                  <CustomCheckbox width="100%" key={course._id} {...getCheckboxProps({ value: course.name + ":" + course._id})} />
+                </div>
+              ))}
+            </ModalBody>
+            <ModalFooter>
+            <Button onClick={onClose} mr={3} background="red">Discard</Button>
+            <Button colorScheme='blue' mr={3} onClick={addAsset}>Add</Button>
+          </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Flex>
     </Card>
   );

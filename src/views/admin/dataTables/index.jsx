@@ -34,6 +34,8 @@ export default function Settings() {
   const [selectedCourseDuration, setSelectedCourseDuration] = useState("");
   const [selectedCourseStartTime, setSelectedCourseStartTime] = useState("");
   const [selectedCourseEndTime, setSelectedCourseEndTime] = useState("");
+  const [selectedCourseStartDate, setSelectedCourseStartDate] = useState("");
+  const [selectedCourseEndDate, setSelectedCourseEndDate] = useState("") 
   const [selectedCourseRepeated, setSelectedCourseRepeated] = useState([]);
   const [selectedCourseFiles, setSelectedCourseFiles] = useState([]);
 
@@ -55,12 +57,15 @@ export default function Settings() {
 
     if (response.data) {
       const course = response.data;
+      console.log(course);
       setSelectedCourseId(course._id);
       setSelectedCourseName(course.name);
       setSelectedCourseDescription(course.courseDescription);
       setSelectedCourseDuration(course.duration);
       setSelectedCourseStartTime(course.startTime);
       setSelectedCourseEndTime(course.endTime);
+      setSelectedCourseStartDate(course.startDate);
+      setSelectedCourseEndDate(course.endDate);
       setSelectedCourseRepeated(course.repeatedDays);
     }
   }
@@ -142,6 +147,10 @@ export default function Settings() {
   };
 
   const fetchUserFiles = async () => {
+    if (selectedCourseId == 0) {
+      return;
+    }
+
     const response = await axios.get(`${INSRUMENT_SERVICE}/asset/list/${localStorage.getItem("userId")}`, {
       headers: {
         "Authorization" : `Bearer ${localStorage.getItem("token")}`,
@@ -149,6 +158,7 @@ export default function Settings() {
     });
 
     if (response.data) {
+      console.log(response.data);
       setFiles(response.data);
     }
   };
@@ -196,9 +206,6 @@ export default function Settings() {
         selectedCourseId != 0 && (
         <Flex m='20px' w='max-content' mx='auto' mt='26px'>
           <Flex mx='auto' me='60px' align='center' direction='column'>
-            <Text color={textColorPrimary} fontSize='2xl' fontWeight='400'>
-              Course Name
-            </Text>
             <Text color='green' fontSize='2xl' fontWeight='700'>
               {selectedCourseName}
             </Text>
@@ -206,26 +213,20 @@ export default function Settings() {
               {selectedCourseDescription}
             </Text>
           </Flex>
-          <Flex mx='auto' me='60px' align='center' direction='column'>
-            <Text color={textColorPrimary} fontSize='2xl' fontWeight='400'>
-                Course Start and End Time
-            </Text>
+          <Flex me='60px' mx='auto' align='center' direction='column'>
             <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
-              {new Date(selectedCourseStartTime).toLocaleString()}
-            </Text>
-            <Text color={textColorSecondary} fontSize='sm' fontWeight='400'>
-              {new Date(selectedCourseEndTime).toLocaleString()}
-            </Text>
-          </Flex>
-          <Flex mx='auto' align='center' direction='column'>
-            <Text color={textColorPrimary} fontSize='2xl' fontWeight='400'>
-              Course Duration
-            </Text>
-            <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
-              {selectedCourseDuration} mins
+              {selectedCourseStartTime} - {selectedCourseEndTime}
             </Text>
             <Text color={textColorSecondary} fontSize='sm' fontWeight='400'>  
               {selectedCourseRepeated.toString()}
+            </Text>
+          </Flex>
+          <Flex mx='auto' ms='60px' align='center' direction='column'>
+            <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
+              {selectedCourseStartDate.substring(0, 10)}
+            </Text>
+            <Text color={textColorSecondary} fontSize='sm' fontWeight='400'>
+              {selectedCourseEndDate.substring(0, 10)}
             </Text>
           </Flex>
         </Flex>)
