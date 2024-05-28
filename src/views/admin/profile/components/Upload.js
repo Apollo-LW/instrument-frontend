@@ -19,6 +19,8 @@ import {
   useCheckbox, 
   useCheckboxGroup,
 } from "@chakra-ui/react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   chakra
 } from "@chakra-ui/system"
@@ -100,7 +102,19 @@ export default function Upload(props) {
       }
     });
     console.log(userAdd);
-  }
+  };
+
+  const showToastMessage = (msg, flg) => {
+    if (flg) {
+      toast.success(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    } else {
+      toast.error(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  };
 
   const uploadFile = async (e) => {
     if (selectedFiles.length == 0) {
@@ -131,7 +145,8 @@ export default function Upload(props) {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
           }
         }).then(assetAddResposne => {
-          setUploadStatus(`Successfully Uploaded ${selectedFiles.length} assets :)`);            
+          //setUploadStatus(`Successfully Uploaded ${selectedFiles.length} assets :)`);            
+          showToastMessage(`Successfully Uploaded ${selectedFiles.length} assets :)`, true);
           setSelectedFiles([]);
           setIsAssetPublic(false);
           const suggestedCousesTmp = assetAddResposne.data.courseSuggestion.courses;
@@ -141,7 +156,8 @@ export default function Upload(props) {
           }
         }).then((tmp) => onOpen());
       }).catch((err) => {
-        setUploadStatus("Upload Failed!");
+        //setUploadStatus("Upload Failed!");
+        showToastMessage(`Upload Failed!`, false);
       })
     });
   };
@@ -160,17 +176,18 @@ export default function Upload(props) {
         });
   
         if (response.data) {
-          alert("Asset Added Successfully " + courseToAdd);
+          showToastMessage("Asset Added Successfully!!", true);
         }
       } catch (err) {
         console.log(err);
-        alert("Failed to add Asset");
+        showToastMessage("Asset Failed to Add", false);
       };
     })).then((response) => console.log(response));
   };
 
   return (
     <Card {...rest} mb='20px' align='center' p='25px'>
+      <ToastContainer />
       <Flex h='100%' direction={{ base: "column", "2xl": "row" }}>
         <Flex
           align='center'

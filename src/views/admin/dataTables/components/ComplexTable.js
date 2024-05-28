@@ -38,7 +38,8 @@ import {
 
 // Custom components
 import Card from "components/card/Card";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // Assets
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import axios from "axios";
@@ -76,6 +77,20 @@ export default function ColumnsTable(props) {
   } = tableInstance;
   initialState.pageSize = 5;
 
+
+  const showToastMessage = (msg, flg) => {
+    if (flg) {
+      toast.success(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    } else {
+      toast.error(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  };
+
+
   const addAsset = async (courseId, fileId) => {
     try {
       const response = await axios.post(`${INSRUMENT_SERVICE}/course/asset`, {
@@ -89,11 +104,11 @@ export default function ColumnsTable(props) {
       });
 
       if (response.data) {
-        alert("Asset Added Successfully");
+        showToastMessage("Asset Added Successfully!!", true);
       }
     } catch (err) {
       console.log(err);
-      alert("Failed to add Asset");
+      showToastMessage("Asset Failed to Add", false);
     }
   };
 
@@ -118,6 +133,7 @@ export default function ColumnsTable(props) {
       w='100%'
       px='0px'
       overflowX={{ sm: "scroll", lg: "hidden" }}>
+      <ToastContainer />
       <Flex px='25px' justify='space-between' mb='20px' align='center'>
         <Text
           color={textColor}

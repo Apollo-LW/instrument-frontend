@@ -33,6 +33,8 @@ import {
   useTable,
 } from "react-table";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function DevelopmentTable(props) {
   const { columnsData, userTasksToAdd, currentCourseId, currentCourseName, currentCourseTask } = props;
@@ -40,6 +42,19 @@ export default function DevelopmentTable(props) {
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => currentCourseTask, [currentCourseTask]);
+
+
+  const showToastMessage = (msg, flg) => {
+    if (flg) {
+      toast.success(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    } else {
+      toast.error(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  };
 
   const addTaskToCourse = async (courseId, taskId) => {
     try {
@@ -57,10 +72,10 @@ export default function DevelopmentTable(props) {
         history.push("/auth");
         return;
       }
-      alert("Task Added Successfully");
+      showToastMessage("Task Added Successfully", true);
       currentCourseTask.push(response.data);
     } catch (error) {
-      alert(error.response.data.message);
+      showToastMessage(error.response.data.message, false);
     }
   };
 
@@ -93,6 +108,7 @@ export default function DevelopmentTable(props) {
       w='100%'
       px='0px'
       overflowX={{ sm: "scroll", lg: "hidden" }}>
+      <ToastContainer />
       <Flex px='25px' justify='space-between' mb='20px' align='center'>
         <Text
           color={textColor}
