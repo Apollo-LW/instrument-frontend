@@ -32,6 +32,8 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Custom components
 import Card from "components/card/Card";
@@ -49,6 +51,18 @@ export default function ColumnsTable(props) {
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
   const INSRUMENT_SERVICE = "http://localhost:3000";
+
+  const showToastMessage = (msg, flg) => {
+    if (flg) {
+      toast.success(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    } else {
+      toast.error(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  };
 
   const addUser = async (e) => {
     console.log(username);
@@ -73,9 +87,11 @@ export default function ColumnsTable(props) {
       });
       console.log(response.data);
       tableData.push(response.data);
+      showToastMessage("Successfully added user " + username + " to course " + currentCourseName, true);
       onClose();
       setError("");
     } catch (error) {
+      showToastMessage("Failed to add user " + username + " to course " + currentCourseName, false);
       setError(error.response.data.message);
     }
   }
@@ -109,6 +125,7 @@ export default function ColumnsTable(props) {
       w='100%'
       px='0px'
       overflowX={{ sm: "scroll", lg: "hidden" }}>
+      <ToastContainer />
       <Flex px='25px' justify='space-between' mb='20px' align='center'>
         <Text
           color={textColor}

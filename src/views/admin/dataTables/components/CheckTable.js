@@ -38,6 +38,8 @@ import { EditIcon } from '@chakra-ui/icons'
 import Card from "components/card/Card";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CheckTable(props) {
   const { columnsData, tableData } = props;
@@ -59,6 +61,19 @@ export default function CheckTable(props) {
   const [taskIsExam, setTaskIsExam] = useState(false);
 
   const INSRUMENT_SERVICE = "http://localhost:3000";
+
+
+  const showToastMessage = (msg, flg) => {
+    if (flg) {
+      toast.success(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    } else {
+      toast.error(msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  };
 
   const createTask = async (e) => {
     if (taskName === '' || taskName === ' ') {
@@ -94,12 +109,13 @@ export default function CheckTable(props) {
           }
         });
       }
-
+      showToastMessage("Task " + taskName + " created successfully", true);
       onClose();
       setError("");
       setTaskId(0);
     } catch (error) {
       setError(error.response.data.message);
+      showToastMessage("Task " + taskName + " failed to be created", false);
     }
   }
 
@@ -131,6 +147,7 @@ export default function CheckTable(props) {
       w='100%'
       px='0px'
       overflowX={{ sm: "scroll", lg: "hidden" }}>
+      <ToastContainer />
       <Flex px='25px' justify='space-between' mb='20px' align='center'>
         <Text
           color={textColor}

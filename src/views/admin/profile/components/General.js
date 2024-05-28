@@ -9,7 +9,7 @@ import { SimpleGrid, Text, useColorModeValue, Modal,
   Divider,
   useDisclosure,
   ModalCloseButton} from "@chakra-ui/react";
-  import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
 // Custom components
@@ -66,7 +66,6 @@ export default function GeneralInformation(props) {
     window.URL.revokeObjectURL(url);
   };
 
-
   const showToastMessage = (msg, flg) => {
     if (flg) {
       toast.success(msg, {
@@ -78,7 +77,6 @@ export default function GeneralInformation(props) {
       });
     }
   };
-
 
   const deleteAsset = async (id) => {
     console.log(id);

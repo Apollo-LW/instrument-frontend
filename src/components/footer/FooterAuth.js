@@ -26,16 +26,6 @@ export default function Footer() {
       justifyContent='space-between'
       px={{ base: "30px", md: "0px" }}
       pb='30px'>
-      <Text
-        color={textColor}
-        textAlign={{
-          base: "center",
-          xl: "start",
-        }}
-        mb={{ base: "20px", lg: "0px" }}>
-        {" "}
-        &copy; {1900 + new Date().getYear()}
-      </Text>
     </Flex>
   );
 }
