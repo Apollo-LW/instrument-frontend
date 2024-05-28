@@ -80,12 +80,14 @@ export default function GeneralInformation(props) {
 
   const deleteAsset = async (id) => {
     console.log(id);
-    const response = await axios.delete(`${ASSET_MANAGMENT}/api/files/${id}`);
-    if (response.data) {
-      console.log(response.data);
-      onClose();
-      showToastMessage("Successfully Deleted the asset", true);
-    }
+    const response = await axios.delete(`${ASSET_MANAGMENT}/api/files/${id}`).then(async (responseRes) => {
+      console.log(responseRes.data);
+      const userRemove = await axios.delete(`${INSRUMENT_SERVICE}/share/${id}/${localStorage.getItem('userid')}`);
+      if (userRemove.data) {
+        onClose();
+        showToastMessage("Successfully Deleted the asset", true);
+      }
+    }).catch(err => showToastMessage("Failed to Delete the asset", false));
   }
 
   useEffect(() => {

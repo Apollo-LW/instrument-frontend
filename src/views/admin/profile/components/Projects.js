@@ -132,11 +132,11 @@ export default function Projects(props) {
         }
       });
       console.log(resposne.data);
-      showToastMessage("Course " + courseName + " created Successfully!!");
+      showToastMessage("Course " + courseName + " created Successfully!!", true);
       onClose();
     } catch (error) {
       // setError(error.response);
-      showToastMessage("Failed to create Course " + courseName);
+      showToastMessage("Failed to create Course " + courseName, false);
       console.log(error);
     }
   };

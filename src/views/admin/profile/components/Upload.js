@@ -153,8 +153,9 @@ export default function Upload(props) {
           if (suggestedCousesTmp.length > 0) {
             setSuggestedCouses(suggestedCousesTmp);
             setAssetId(assetAddResposne.data.courseSuggestion.assetId);
+            onOpen();
           }
-        }).then((tmp) => onOpen());
+        }).then((tmp) => console.log(tmp));
       }).catch((err) => {
         //setUploadStatus("Upload Failed!");
         showToastMessage(`Upload Failed!`, false);

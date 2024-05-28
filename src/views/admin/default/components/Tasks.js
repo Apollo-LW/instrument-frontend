@@ -11,13 +11,41 @@ import {
 import Card from "components/card/Card.js";
 import Menu from "components/menu/MainMenu";
 import IconBox from "components/icons/IconBox";
+import axios from "axios";
+
 
 // Assets
 import { MdCheckBox, MdDragIndicator } from "react-icons/md";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function Conversion(props) {
   const { ...rest } = props;
+
+  const INSRUMENT_SERVICE = "http://localhost:3000";
+  const [tasks, setTasks] = useState([]);
+  const history = useHistory();
+
+  const fetchUserTasks = async () => {
+    const response = await axios.get(`${INSRUMENT_SERVICE}/task/user/list/${localStorage.getItem("userId")}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.status == 401) {
+      history.push("/auth");
+      return;
+    }
+
+    if (response.data) {
+      setTasks(response.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserTasks();
+  }, []);
 
   // Chakra Color Mode
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -37,94 +65,29 @@ export default function Conversion(props) {
         <Text color={textColor} fontSize='lg' fontWeight='700'>
           Tasks
         </Text>
-        <Menu ms='auto' />
       </Flex>
       <Box px='11px'>
-        <Flex mb='20px'>
-          <Checkbox me='16px' colorScheme='brandScheme' />
-          <Text
-            fontWeight='bold'
-            color={textColor}
-            fontSize='md'
-            textAlign='start'>
-            Front-End for Grad Project
-          </Text>
-          <Icon
-            ms='auto'
-            as={MdDragIndicator}
-            color='secondaryGray.600'
-            w='24px'
-            h='24px'
-          />
-        </Flex>
-        <Flex mb='20px'>
-          <Checkbox me='16px' defaultChecked colorScheme='brandScheme' />
-          <Text
-            fontWeight='bold'
-            color={textColor}
-            fontSize='md'
-            textAlign='start'>
-            API documentation for Grad Project
-          </Text>
-          <Icon
-            ms='auto'
-            as={MdDragIndicator}
-            color='secondaryGray.600'
-            w='24px'
-            h='24px'
-          />
-        </Flex>
-        <Flex mb='20px'>
-          <Checkbox defaultChecked me='16px' colorScheme='brandScheme' />
-          <Text
-            fontWeight='bold'
-            color={textColor}
-            fontSize='md'
-            textAlign='start'>
-            Physics II Quiz #3
-          </Text>
-          <Icon
-            ms='auto'
-            as={MdDragIndicator}
-            color='secondaryGray.600'
-            w='24px'
-            h='24px'
-          />
-        </Flex>
-        <Flex mb='20px'>
-          <Checkbox me='16px' colorScheme='brandScheme' />
-          <Text
-            fontWeight='bold'
-            color={textColor}
-            fontSize='md'
-            textAlign='start'>
-            Algorithms Quiz #2
-          </Text>
-          <Icon
-            ms='auto'
-            as={MdDragIndicator}
-            color='secondaryGray.600'
-            w='24px'
-            h='24px'
-          />
-        </Flex>
-        <Flex mb='20px'>
-          <Checkbox defaultChecked me='16px' colorScheme='brandScheme' />
-          <Text
-            fontWeight='bold'
-            color={textColor}
-            fontSize='md'
-            textAlign='start'>
-            Operating Systems Lab #6
-          </Text>
-          <Icon
-            ms='auto'
-            as={MdDragIndicator}
-            color='secondaryGray.600'
-            w='24px'
-            h='24px'
-          />
-        </Flex>
+        {
+          tasks.map((task, idx) => {
+            return <Flex mb='20px'>
+              <Checkbox me='16px' colorScheme='brandScheme' />
+              <Text
+                key={idx + 1}
+                fontWeight='bold'
+                color={textColor}
+                fontSize='md'
+                textAlign='start'>
+                {task.name}
+              </Text>
+              <Icon
+                ms='auto'
+                as={MdDragIndicator}
+                color='secondaryGray.600'
+                w='24px'
+                h='24px'/>
+            </Flex>
+          })
+        }
       </Box>
     </Card>
   );

@@ -23,10 +23,7 @@ import ComplexTable from "views/admin/default/components/ComplexTable";
 import Tasks from "views/admin/default/components/Tasks";
 import TotalSpent from "views/admin/default/components/TotalSpent";
 import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
-import {
-  columnsDataCheck,
-  columnsDataComplex,
-} from "views/admin/default/variables/columnsData";
+import { columnsDataCheckExam } from "views/admin/dataTables/variables/columnsData";
 import tableDataComplex from "views/admin/default/variables/tableDataComplex.json";
 
 export default function UserReports() {
@@ -36,6 +33,10 @@ export default function UserReports() {
 
   const history = useHistory();
   const [numberOfCourses, setNumberOfCourses] = useState(0);
+  const [numberOfDocuments, setNumberOfDocuments] = useState(0);
+  const [numberOfTaskDoneLastMonth, setNumberOfTaskDoneLastMonth] = useState(0);
+  const [numberOfTaskDue, setNumberOfTaskDue] = useState(0);
+  const [exams, setExams] = useState([]);
   const { token, loading } = useContext(AuthContext);
 
   const fetchNumberOfCourses = async () => {
@@ -50,14 +51,104 @@ export default function UserReports() {
         if (x) {
           setNumberOfCourses(x);
         } 
+      } else {
+        history.push('auth');
       }
     } catch (e) {
       console.log(e);
     }
   };
 
+  const fetchNumberOfDocuments = async () => {
+    try {
+      if (localStorage.getItem("token") != null) {
+          const response = await axios.get(`http://localhost:3000/asset/count/${localStorage.getItem("userId")}`, {
+          headers: {
+            "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+          }
+        });
+        const x = response.data;
+        if (x) {
+          setNumberOfDocuments(x);
+        } 
+      } else {
+        history.push('auth/sign-in');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const fetchNumberOfTaskDoneLastMonth = async () => {
+    try {
+      if (localStorage.getItem("token") != null) {
+          const response = await axios.get(`http://localhost:3000/task/count/${localStorage.getItem("userId")}`, {
+          headers: {
+            "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+          }
+        });
+        const x = response.data;
+        if (x) {
+          const y = x.reduce((sum, x) => sum + x, 0);
+          setNumberOfTaskDoneLastMonth(y);
+        } 
+      } else {
+        history.push('auth/sign-in');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const fetchTaskDueInWeek = async () => {
+    try {
+      if (localStorage.getItem("token") != null) {
+          const response = await axios.get(`http://localhost:3000/task/count/due/${localStorage.getItem("userId")}`, {
+          headers: {
+            "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+          }
+        });
+        const x = response.data;
+        if (x) {
+          const y = x.reduce((sum, x) => sum + x, 0);
+          setNumberOfTaskDue(y);
+        } 
+      } else {
+        history.push('auth/sign-in');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const fetchUserExams = async () => {
+    const response = await axios.get(`http://localhost:3000/task/user/exam/${localStorage.getItem("userId")}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      }
+    });
+
+    if (response.status == 401) {
+      history.push("/auth");
+      return;
+    }
+
+    if (response.data) {
+      const x = response.data;
+      const y = x.filter(x => x != null);
+      console.log(y);
+      setExams(y);
+      console.log(response.data);
+    }
+  };
+
+
   useEffect(() => {
     fetchNumberOfCourses();
+    fetchNumberOfDocuments();
+    fetchNumberOfTaskDoneLastMonth();
+    fetchTaskDueInWeek();
+    fetchUserExams();
   }, []);
 
   if (loading) {
@@ -86,9 +177,9 @@ export default function UserReports() {
             />
           }
           name='Total Documents'
-          value='293'
+          value={numberOfDocuments}
         />
-        <MiniStatistics growth='+23%' name='Tasks Done' value='14' />
+        <MiniStatistics growth='+23%' name='Tasks Done' value={numberOfTaskDoneLastMonth} />
         <MiniStatistics
           endContent={
             <Flex me='-16px' mt='10px'>
@@ -107,7 +198,7 @@ export default function UserReports() {
             />
           }
           name='Tasks due in 7 days'
-          value='5'
+          value={numberOfTaskDue}
         />
       </SimpleGrid>
 
@@ -117,8 +208,8 @@ export default function UserReports() {
       </SimpleGrid>
       <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
         <ComplexTable
-          columnsData={columnsDataComplex}
-          tableData={tableDataComplex}
+          columnsData={columnsDataCheckExam}
+          tableData={exams}
         />
         <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px'>
           <Tasks />

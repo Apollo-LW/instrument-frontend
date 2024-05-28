@@ -18,16 +18,22 @@ import { ItemContent } from 'components/menu/ItemContent';
 import { SearchBar } from 'components/navbar/searchBar/SearchBar';
 import { SidebarResponsive } from 'components/sidebar/Sidebar';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect, useState } from "react";
 // Assets
 import navImage from 'assets/img/layout/Navbar.png';
 import { MdNotificationsNone, MdInfoOutline } from 'react-icons/md';
 import { FaEthereum } from 'react-icons/fa';
 import routes from 'routes.js';
 import { ThemeEditor } from './ThemeEditor';
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import axios from "axios";
+
 export default function HeaderLinks(props) {
 	const { secondary } = props;
+	const INSRUMENT_SERVICE = "http://localhost:3000";
+
 	// Chakra Color Mode
+	const history = useHistory();
 	const navbarIcon = useColorModeValue('gray.400', 'white');
 	let menuBg = useColorModeValue('white', 'navy.800');
 	const textColor = useColorModeValue('secondaryGray.900', 'white');
@@ -40,6 +46,24 @@ export default function HeaderLinks(props) {
 		'14px 17px 40px 4px rgba(112, 144, 176, 0.18)',
 		'14px 17px 40px 4px rgba(112, 144, 176, 0.06)'
 	);
+	const [username, setUsername] = useState("");
+
+	const fetchUsername = async () => {
+		const response = await axios.get(`${INSRUMENT_SERVICE}/user/${localStorage.getItem("userId")}`, {
+			headers: {
+			"Authorization" : `Bearer ${localStorage.getItem("token")}`,
+			}
+		});
+
+		if (response.data) {
+			setUsername(response.data.username);
+		}
+	};
+
+
+	useEffect(() => {
+		fetchUsername();
+	}, [])
 	const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
 	return (
 		<Flex
@@ -85,7 +109,7 @@ export default function HeaderLinks(props) {
 					<Avatar
 						_hover={{ cursor: 'pointer' }}
 						color="white"
-						name="Adela Parkson"
+						name={username}
 						bg="#11047A"
 						size="sm"
 						w="40px"
@@ -104,11 +128,13 @@ export default function HeaderLinks(props) {
 							fontSize="sm"
 							fontWeight="700"
 							color={textColor}>
-							👋&nbsp; Hey, Adela
+							👋&nbsp; Hey, {username}
 						</Text>
 					</Flex>
 					<Flex flexDirection="column" p="10px">
-						<MenuItem _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" px="14px">
+						<MenuItem _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" px="14px" onClick={() => {
+							history.push('/admin/profile')
+						}}>
 							<Text fontSize="sm">Profile Settings</Text>
 						</MenuItem>
 						<MenuItem
@@ -117,7 +143,10 @@ export default function HeaderLinks(props) {
 							color="red.400"
 							borderRadius="8px"
 							px="14px">
-							<Text fontSize="sm">Log out</Text>
+							<Text fontSize="sm" onClick={() => {
+								localStorage.removeItem('token');
+								history.push('/auth');
+							}}>Log out</Text>
 						</MenuItem>
 					</Flex>
 				</MenuList>

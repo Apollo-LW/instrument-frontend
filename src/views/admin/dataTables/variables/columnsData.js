@@ -39,6 +39,25 @@ export const columnsDataCheck = [
   }
 ];
 
+export const columnsDataCheckExam = [
+  {
+    Header: "NAME",
+    accessor: "name",
+  },
+  {
+    Header: "STATUS",
+    accessor: "status",
+  },
+  {
+    Header: "DUE DATE",
+    accessor: "dueDate",
+  }, 
+  {
+    Header: "DESCRIPTION",
+    accessor: "desciption",
+  }
+];
+
 export const columnsDataColumns = [
   {
     Header: "USERNAME",
